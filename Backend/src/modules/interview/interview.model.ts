@@ -1,23 +1,44 @@
 import { Schema, model, Document, Types } from 'mongoose';
 import { INTERVIEW_TYPES, InterviewType } from '@/config/constants';
 
+interface IClarificationExchange {
+  question: string;
+  response: string;
+  wasFlagged: boolean;
+  usedFallback: boolean;
+  askedAt: Date;
+}
+
 interface IQuestionAnswer {
   question: string;
   answer: string;
-  evaluation?: Types.ObjectId; // ref to Evaluation, set after AI evaluates
+  evaluation?: Types.ObjectId;
+  presentedAt: Date;
+  clarifications: IClarificationExchange[];
 }
 
 export interface IInterview extends Document {
   session: Types.ObjectId;
   type: InterviewType;
   questions: IQuestionAnswer[];
-  overallScore?: number; // 0-100, set when interview part completes
+  overallScore?: number;
   overallFeedback?: string;
   startedAt: Date;
   completedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
+
+const clarificationSchema = new Schema<IClarificationExchange>(
+  {
+    question: { type: String, required: true },
+    response: { type: String, required: true },
+    wasFlagged: { type: Boolean, default: false },
+    usedFallback: { type: Boolean, default: false },
+    askedAt: { type: Date, default: Date.now },
+  },
+  { _id: false }
+);
 
 const interviewSchema = new Schema<IInterview>(
   {
@@ -38,6 +59,8 @@ const interviewSchema = new Schema<IInterview>(
           question: { type: String, required: true },
           answer: { type: String, default: '' },
           evaluation: { type: Schema.Types.ObjectId, ref: 'Evaluation' },
+          presentedAt: { type: Date, required: true, default: Date.now },
+          clarifications: { type: [clarificationSchema], default: [] },
         },
       ],
       default: [],

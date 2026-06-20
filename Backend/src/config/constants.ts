@@ -38,3 +38,9 @@ export const SUBMISSION_SOURCES = {
 } as const;
 
 export type SubmissionSource = (typeof SUBMISSION_SOURCES)[keyof typeof SUBMISSION_SOURCES];
+
+export const DSA_TIME_LIMIT_MS = {
+  EASY: DSA_TIME_ALLOCATION_MINUTES.EASY * 60 * 1000,
+  MEDIUM: DSA_TIME_ALLOCATION_MINUTES.MEDIUM * 60 * 1000,
+  HARD: DSA_TIME_ALLOCATION_MINUTES.HARD * 60 * 1000,
+} as const;
