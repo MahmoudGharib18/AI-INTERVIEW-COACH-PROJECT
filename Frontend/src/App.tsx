@@ -1,15 +1,14 @@
 import React from 'react';
-import { AppRoutes } from './routes/AppRoutes';
+import { BrowserRouter as Router } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { AppRoutes } from './routes/AppRoutes';
 
-const App: React.FC = () => {
+export default function App() {
   return (
-    <AuthProvider>
-      <div className="w-full h-screen relative selection:bg-cyber-neonGreen selection:text-black selection:font-bold">
+    <Router>
+      <AuthProvider>
         <AppRoutes />
-      </div>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
-};
-
-export default App;
+}

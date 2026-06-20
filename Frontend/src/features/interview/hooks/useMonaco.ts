@@ -1,24 +1,39 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-export const useMonaco = (initialLanguage = 'javascript') => {
-  const [code, setCode] = useState('// Initialize algorithmic logic here...');
-  const [language, setLanguage] = useState(initialLanguage);
+export const useMonaco = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
-  const editorOptions = {
-    theme: 'vs-dark',
-    fontFamily: 'Fira Code, JetBrains Mono, Courier New, monospace',
-    fontSize: 14,
-    lineHeight: 22,
-    minimap: { enabled: false },
-    scrollbar: { vertical: 'visible', horizontal: 'visible' },
-    selectOnLineNumbers: true,
-    roundedSelection: false,
-    readOnly: false,
-    cursorStyle: 'block',
-    cursorBlinking: 'blink',
-    automaticLayout: true,
-    padding: { top: 12, bottom: 12 }
-  };
+  useEffect(() => {
+    if ((window as any).monaco) {
+      setIsLoaded(true);
+      return;
+    }
 
-  return { code, setCode, language, setLanguage, editorOptions };
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js';
+    script.async = true;
+    
+    script.onload = () => {
+      const require = (window as any).require;
+      if (require) {
+        require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs' } });
+        require(['vs/editor/main'], () => {
+          setIsLoaded(true);
+        }, (err: any) => {
+          setError(err);
+        });
+      } else {
+        setError(new Error('Monaco loader dependencies unresolved.'));
+      }
+    };
+
+    script.onerror = () => {
+      setError(new Error('Failed to download Monaco editor distribution from secure CDN grid.'));
+    };
+
+    document.body.appendChild(script);
+  }, []);
+
+  return { isLoaded, error };
 };

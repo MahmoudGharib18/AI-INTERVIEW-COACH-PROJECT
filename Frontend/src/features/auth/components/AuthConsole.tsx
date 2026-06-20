@@ -1,139 +1,132 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../context/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuthActions } from '../hooks/useAuthActions';
+import { Input } from '../../../components/ui/Input';
 import { Button } from '../../../components/ui/Button';
+import { APP_ROUTES } from '../../../config/constants';
 
-interface AuthConsoleProps {
-  isRegister?: boolean;
-}
-
-export const AuthConsole: React.FC<AuthConsoleProps> = ({ isRegister: initialIsRegister = false }) => {
+export const AuthConsole: React.FC = () => {
   const navigate = useNavigate();
-  const { login, register } = useAuth();
-  const [isRegister, setIsRegister] = useState(initialIsRegister);
-  const [formData, setFormData] = useState({ name: '', email: '', password: '', preferredInterviewTime: '09:00' });
-  const [systemError, setSystemError] = useState<string | null>(null);
-  const [working, setWorking] = useState(false);
+  const location = useLocation();
+  const { executeLogin, executeRegister, isSubmitting, authError, clearError } = useAuthActions();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-    if (systemError) setSystemError(null);
+  const [isLoginMode, setIsLoginMode] = useState(true);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    preferredInterviewTime: '09:00'
+  });
+
+  // Check state to preserve redirection history
+  const destinationTarget = (location.state as any)?.from?.pathname || APP_ROUTES.DASHBOARD;
+
+  const handleInputChange = (field: string, value: string) => {
+    if (authError) clearError();
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleFormSubmission = async (e: React.FormEvent) => {
     e.preventDefault();
-    setWorking(true);
-    setSystemError(null);
-
-    try {
-      if (isRegister) {
-        await register(formData);
-      } else {
-        await login({ email: formData.email, password: formData.password });
-      }
-      navigate('/dashboard');
-    } catch (err: any) {
-      setSystemError(err.message || 'ACCESS_DENIED: Operational failure.');
-    } finally {
-      setWorking(false);
+    
+    if (isLoginMode) {
+      const result = await executeLogin({ email: formData.email, password: formData.password });
+      if (result.success) navigate(destinationTarget, { replace: true });
+    } else {
+      const result = await executeRegister(formData);
+      if (result.success) navigate(destinationTarget, { replace: true });
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-cyber-bg p-4 scanlines">
-      <div className="w-full max-w-md bg-cyber-surface border-2 border-cyber-border p-6 shadow-brutal relative">
+    <div className="min-h-screen bg-[#0a0a0c] flex items-center justify-center p-4 font-mono scanlines">
+      <div className="w-full max-w-md bg-[#121215] border-2 border-[#26262b] p-6 shadow-brutal hover:border-[#00ff66] transition-colors duration-500">
         
-        {/* Terminal Header Telemetry */}
-        <div className="flex items-center justify-between border-b-2 border-cyber-border pb-4 mb-6">
+        {/* Terminal Header */}
+        <div className="border-b border-[#26262b] pb-3 mb-6 flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <div className="w-2.5 h-2.5 bg-cyber-neonOrange rounded-full animate-pulse" />
-            <span className="text-xs font-bold tracking-widest text-white">
-              {isRegister ? 'SYS//SECURE_SIGNUP' : 'SYS//SECURE_AUTH'}
+            <div className={`w-2 h-2 rounded-full ${isSubmitting ? 'bg-[#ff5500] animate-ping' : 'bg-[#00ff66]'}`} />
+            <span className="text-xs font-black text-white tracking-widest uppercase">
+              {isLoginMode ? 'SECURE_AUTH_LOGIN' : 'INITIALIZE_OPERATOR'}
             </span>
           </div>
-          <span className="text-[10px] text-cyber-textMuted font-mono">NODE_V1.0</span>
+          <span className="text-[9px] text-[#8a8a93] tracking-tight">V1.0.0-SYS</span>
         </div>
 
-        {systemError && (
-          <div className="bg-transparent border border-cyber-neonRed text-cyber-neonRed text-xs p-3 font-mono mb-4 rounded uppercase tracking-wider animate-shake">
-            ⚠️ CRITICAL_ERR // {systemError}
+        {/* Global Error Banner */}
+        {authError && (
+          <div className="bg-[#ff0033]/5 border border-[#ff0033] p-3 text-xs text-[#ff0033] mb-4 font-bold tracking-wide uppercase">
+            ⚡ FAILURE // {authError}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {isRegister && (
-            <div>
-              <label className="block text-[11px] text-cyber-textMuted font-bold mb-1 tracking-wider">CANDIDATE_NAME</label>
-              <input
-                type="text"
-                name="name"
-                required
-                value={formData.name}
-                onChange={handleInputChange}
-                className="w-full bg-cyber-bg border-2 border-cyber-border p-2.5 text-sm font-mono text-white focus:outline-none focus:border-cyber-neonGreen transition-colors"
-                placeholder="Mahmoud"
-              />
-            </div>
+        <form onSubmit={handleFormSubmission} className="space-y-4">
+          {!isLoginMode && (
+            <Input
+              label="Operator Name"
+              type="text"
+              required
+              disabled={isSubmitting}
+              value={formData.name}
+              onChange={(e) => handleInputChange('name', e.target.value)}
+              placeholder="e.g., Mahmoud"
+            />
           )}
 
-          <div>
-            <label className="block text-[11px] text-cyber-textMuted font-bold mb-1 tracking-wider">SECURE_EMAIL</label>
-            <input
-              type="email"
-              name="email"
-              required
-              value={formData.email}
-              onChange={handleInputChange}
-              className="w-full bg-cyber-bg border-2 border-cyber-border p-2.5 text-sm font-mono text-white focus:outline-none focus:border-cyber-neonGreen transition-colors"
-              placeholder="operator@domain.com"
-            />
-          </div>
+          <Input
+            label="Security Link Email"
+            type="email"
+            required
+            disabled={isSubmitting}
+            value={formData.email}
+            onChange={(e) => handleInputChange('email', e.target.value)}
+            placeholder="mahmoud@domain.com"
+          />
 
-          <div>
-            <label className="block text-[11px] text-cyber-textMuted font-bold mb-1 tracking-wider">CIPHER_PASSWORD</label>
-            <input
-              type="password"
-              name="password"
-              required
-              minLength={8}
-              value={formData.password}
-              onChange={handleInputChange}
-              className="w-full bg-cyber-bg border-2 border-cyber-border p-2.5 text-sm font-mono text-white focus:outline-none focus:border-cyber-neonGreen transition-colors"
-              placeholder="••••••••"
-            />
-          </div>
+          <Input
+            label="Cryptographic Password"
+            type="password"
+            required
+            disabled={isSubmitting}
+            value={formData.password}
+            onChange={(e) => handleInputChange('password', e.target.value)}
+            placeholder="********"
+          />
 
-          {isRegister && (
-            <div>
-              <label className="block text-[11px] text-cyber-textMuted font-bold mb-1 tracking-wider">ORCHESTRATION_TIME (HH:MM)</label>
-              <input
-                type="text"
-                name="preferredInterviewTime"
-                required
-                pattern="^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$"
-                value={formData.preferredInterviewTime}
-                onChange={handleInputChange}
-                className="w-full bg-cyber-bg border-2 border-cyber-border p-2.5 text-sm font-mono text-white focus:outline-none focus:border-cyber-neonGreen transition-colors"
-                placeholder="09:00"
-              />
-            </div>
+          {!isLoginMode && (
+            <Input
+              label="Daily Cron Launch Window (HH:MM)"
+              type="text"
+              required
+              disabled={isSubmitting}
+              value={formData.preferredInterviewTime}
+              onChange={(e) => handleInputChange('preferredInterviewTime', e.target.value)}
+              placeholder="09:00"
+            />
           )}
 
-          <Button type="submit" variant={isRegister ? "orange" : "neon"} className="w-full mt-2" disabled={working}>
-            {working ? 'PROCESSING...' : isRegister ? 'INITIALIZE_ACCOUNT' : 'EXECUTE_LOGIN'}
+          <Button 
+            type="submit" 
+            variant={isLoginMode ? 'neon' : 'orange'} 
+            className="w-full mt-2" 
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'TRANSMITTING_TELEMETRY...' : isLoginMode ? 'ESTABLISH_SESSION_LINK' : 'PROVISION_CORE_PROFILE'}
           </Button>
         </form>
 
-        <div className="mt-6 text-center border-t border-cyber-border pt-4">
+        {/* Switch Modality Footer */}
+        <div className="mt-6 pt-4 border-t border-[#26262b] text-center">
           <button
             type="button"
+            disabled={isSubmitting}
             onClick={() => {
-              setIsRegister(!isRegister);
-              setSystemError(null);
+              clearError();
+              setIsLoginMode(prev => !prev);
             }}
-            className="text-xs text-cyber-textMuted hover:text-white transition-colors underline underline-offset-4 decoration-cyber-border font-mono"
+            className="text-[10px] tracking-widest font-black text-[#8a8a93] hover:text-white uppercase transition-colors"
           >
-            {isRegister ? '← SWITCH TO EXISTING OPERATOR LOGIN' : 'CREATE NEW OPERATIONS ACCOUNT →'}
+            {isLoginMode ? '[CREATE NEW OPERATOR KEY]' : '[RETURN TO USER TERMINAL ACCESS]'}
           </button>
         </div>
 

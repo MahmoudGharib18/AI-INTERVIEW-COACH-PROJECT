@@ -1,160 +1,124 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { api } from '../../../lib/api-client';
+import { ProgressHUD } from './ProgressHUD';
+import { CodeConsole } from './CodeConsole';
+import { ChatFeed } from './ChatFeed';
 import { Button } from '../../../components/ui/Button';
-import { useInterval } from '../../../hooks/useInterval';
 
-interface SessionData {
-  id: string;
-  status: 'PENDING' | 'EMAIL_SENT' | 'STARTED' | 'DSA_IN_PROGRESS' | 'TECHNICAL_IN_PROGRESS' | 'COMPLETED';
-  scheduledTime: string; // ISO string from backend
-  isLate: boolean;
+interface ArenaHUDProps {
+  sessionType: 'dsa' | 'technical';
+  onPhaseCompleted: () => void;
 }
 
-export const ArenaHUD: React.FC = () => {
-  const navigate = useNavigate();
-  const [session, setSession] = useState<SessionData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [timeLeftStr, setTimeLeftStr] = useState('03:00:00');
-  const [systemLogs, setSystemLogs] = useState<string[]>(['INITIALIZING ARENA CORE...', 'CONNECTING TELEMETRY LINK...']);
+export const ArenaHUD: React.FC<ArenaHUDProps> = ({ sessionType, onPhaseCompleted }) => {
+  const [code, setCode] = useState('// Initialize algorithmic logic here...\n');
+  const [chatInput, setChatInput] = useState('');
+  const [messages, setMessages] = useState<{ role: 'agent' | 'user'; text: string; timestamp: string }[]>([]);
+  const [expirationTime, setExpirationTime] = useState<string>(new Date(Date.now() + 10 * 60 * 1000).toISOString());
+  const [submitting, setSubmitting] = useState(false);
+  const [currentPrompt, setCurrentPrompt] = useState('Fetching operational evaluation setup problem node data...');
 
-  const addLog = (msg: string) => {
-    setSystemLogs(prev => [...prev.slice(-4), `[${new Date().toLocaleTimeString()}] ${msg}`]);
-  };
-
-  const fetchActiveSession = async () => {
-    try {
-      const response: any = await api.get('/sessions/active');
-      if (response.data && response.data.session) {
-        setSession(response.data.session);
-        addLog(`SESSION LINK ESTABLISHED: STATUS // ${response.data.session.status}`);
-      } else {
-        setSession(null);
-        addLog('NO ACTIVE DAILY SESSIONS FOUND FOR CURRENT CYCLE.');
-      }
-    } catch (err: any) {
-      addLog(`CRITICAL ERROR: FETCH FAILED // ${err.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const endpointPath = sessionType === 'dsa' ? '/dsa-interview' : '/technical-interview';
 
   useEffect(() => {
-    fetchActiveSession();
-  }, []);
+    const startArenaSession = async () => {
+      try {
+        // Triggers phase creation matching POST /api/dsa-interview/start in API_REFERENCE.md
+        const res: any = await api.post(`${endpointPath}/start`);
+        if (res && res.data) {
+          setCurrentPrompt(res.data.problem?.description || res.data.question || 'Setup extracted successfully.');
+          setMessages([{
+            role: 'agent',
+            text: res.data.problem?.description || res.data.question || 'Begin execution pattern sequence immediately.',
+            timestamp: new Date().toLocaleTimeString()
+          }]);
+          if (res.data.expiresAt) {
+            setExpirationTime(res.data.expiresAt);
+          }
+        }
+      } catch (err: any) {
+        setCurrentPrompt(`CRITICAL_ARENA_INITIALIZATION_FAULT: ${err.message || 'Check database pipelines.'}`);
+      }
+    };
+    startArenaSession();
+  }, [sessionType]);
 
-  // Update countdown clock every second if session is waiting for activation
-  useInterval(() => {
-    if (!session || (session.status !== 'PENDING' && session.status !== 'EMAIL_SENT')) return;
+  const handleSendMessage = async () => {
+    if (!chatInput.trim()) return;
+    const userText = chatInput;
+    setChatInput('');
+    
+    setMessages(prev => [...prev, { role: 'user', text: userText, timestamp: new Date().toLocaleTimeString() }]);
 
-    const scheduled = new Date(session.scheduledTime).getTime();
-    const threeHoursLimit = scheduled + 3 * 60 * 60 * 1000; // 3-hour response window
-    const now = Date.now();
-    const difference = threeHoursLimit - now;
-
-    if (difference <= 0) {
-      setTimeLeftStr('00:00:00');
-      setSession(null); // Triggers missed re-evaluation display state
-      addLog('TIME EXPIRED. ACTIVE SESSION MARKED MISSED BY ORCHESTRATOR.');
-    } else {
-      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24).toString().padStart(2, '0');
-      const minutes = Math.floor((difference / (1000 * 60)) % 60).toString().padStart(2, '0');
-      const seconds = Math.floor((difference / 1000) % 60).toString().padStart(2, '0');
-      setTimeLeftStr(`${hours}:${minutes}:${seconds}`);
-    }
-  }, 1000);
-
-  const handleBeginSession = async () => {
-    if (!session) return;
-    addLog('TRANSMITTING ACTIVATE SIGNAL... GENERATING INTEL INTERVIEW PAIRS.');
     try {
-      const response: any = await api.post(`/daily-session/${session.id}/begin`);
-      addLog('PROBLEMS INJECTED SUCCESS. STREAMING TO ARENA LAYER.');
-      
-      // Pass the response metadata straight into your live arena execution workspace
-      navigate('/arena/dsa', { state: { dsaData: response.data } });
-    } catch (err: any) {
-      addLog(`INITIATE REJECTED: ${err.message}`);
+      // Direct correlation with POST /api/dsa-interview/clarify or technical equivalent mapping parameters
+      const res: any = await api.post(`${endpointPath}/clarify`, { question: userText });
+      if (res && res.data) {
+        setMessages(prev => [...prev, {
+          role: 'agent',
+          text: res.data.response || 'Clarification received and cached.',
+          timestamp: new Date().toLocaleTimeString()
+        }]);
+      }
+    } catch (err) {
+      setMessages(prev => [...prev, { role: 'agent', text: 'SYSTEM_ROUTING_ERROR: Failed to transmit statement.', timestamp: new Date().toLocaleTimeString() }]);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="h-[60vh] flex items-center justify-center font-mono text-cyber-neonGreen animate-pulse">
-        PULLING_SATELLITE_ORCHESTRATOR_METRICS...
-      </div>
-    );
-  }
+  const handleFinalCompilationSubmit = async () => {
+    setSubmitting(true);
+    try {
+      // Maps precisely to POST /api/dsa-interview/submit matching API_REFERENCE.md
+      await api.post(`${endpointPath}/submit`, {
+        code: sessionType === 'dsa' ? code : undefined,
+        answer: sessionType === 'technical' ? code : undefined,
+        language: 'javascript'
+      });
+      onPhaseCompleted();
+    } catch (err) {
+      console.error('Final matrix lock error', err);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
-      {/* System Status Ribbon */}
-      <div className="flex items-center justify-between border-b-2 border-cyber-border pb-4">
-        <h1 className="text-xl font-black tracking-wider text-white">INTERVIEW_ARENA // GATEKEEPER</h1>
-        <div className="flex items-center space-x-2 bg-cyber-surface border border-cyber-border px-3 py-1 rounded">
-          <span className="text-[10px] text-cyber-textMuted font-bold">NODE_STATUS:</span>
-          <span className="text-[10px] text-cyber-neonGreen font-bold tracking-widest uppercase">
-            {session ? session.status : 'IDLE'}
-          </span>
+    <div className="space-y-4 font-mono">
+      <ProgressHUD 
+        expiresAt={expirationTime} 
+        phaseLabel={`${sessionType.toUpperCase()}_EVALUATION_MATRIX`} 
+        onTimeExpired={handleFinalCompilationSubmit} 
+      />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Left Hand: Monaco Code Engine Panel */}
+        <div className="flex flex-col space-y-3">
+          <div className="bg-[#121215] border-2 border-[#26262b] p-4 text-xs leading-relaxed text-gray-300 shadow-brutal select-text">
+            <span className="text-white font-black block mb-2 border-b border-[#26262b] pb-1 uppercase">🎯 PROBLEM_NODE_CONSTRAINTS</span>
+            {currentPrompt}
+          </div>
+          <div className="flex-1">
+            <CodeConsole code={code} onChange={setCode} language={sessionType === 'dsa' ? 'javascript' : 'markdown'} />
+          </div>
+        </div>
+
+        {/* Right Hand: Interactive Chat Streams */}
+        <div className="flex flex-col justify-between space-y-4">
+          <div className="flex-1">
+            <ChatFeed 
+              messages={messages} 
+              inputValue={chatInput} 
+              onInputChange={setChatInput} 
+              onSendMessage={handleSendMessage} 
+              disabled={submitting} 
+            />
+          </div>
+
+          <Button variant="orange" className="w-full" onClick={handleFinalCompilationSubmit} disabled={submitting}>
+            {submitting ? 'COMPILING_SUBMISSION_REPORT...' : 'LOCK_AND_SUBMIT_PHASE_METRICS'}
+          </Button>
         </div>
       </div>
-
-      {!session ? (
-        /* Scenario A: No active session available */
-        <div className="bg-cyber-surface border-2 border-cyber-border p-8 text-center shadow-brutal scanlines">
-          <div className="text-cyber-textMuted text-sm font-bold mb-2">⚡ ALL CURRENT TERMINAL CHANNELS STANDING BY</div>
-          <p className="text-xs text-gray-400 max-w-md mx-auto">
-            Your automated daily session framework hasn't fired yet or the response timeline window elapsed. System checks execute on cron alignment parameters.
-          </p>
-        </div>
-      ) : (
-        /* Scenario B: Active session waiting to be initialised */
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
-          {/* Main Ticking Operational Field */}
-          <div className="md:col-span-2 bg-cyber-surface border-2 border-cyber-border p-6 shadow-brutal flex flex-col justify-between scanlines">
-            <div>
-              <div className="text-[10px] text-cyber-textMuted font-bold tracking-widest mb-1">DECOMPRESSION_DEADLINE</div>
-              <div className="text-5xl font-black tracking-tighter text-cyber-neonOrange font-mono drop-shadow-[0_0_10px_rgba(255,85,0,0.15)] mb-4">
-                {timeLeftStr}
-              </div>
-              <p className="text-xs text-gray-400 mb-6 leading-relaxed">
-                You have a hard 3-hour response initialization pipeline limit from execution lock. Starting this engine drops you into sequential 30-minute code/technical mock environments.
-              </p>
-            </div>
-
-            {session.isLate && (
-              <div className="border border-cyber-neonRed text-cyber-neonRed text-[11px] p-2 rounded mb-4 tracking-widest uppercase font-bold animate-pulse">
-                ⚠️ WARNING: RETRIEVAL TRIGGER METRICS MARKED LATE WINDOW
-              </div>
-            )}
-
-            <Button variant="orange" onClick={handleBeginSession} className="w-full">
-              INITIALIZE_LIVE_ARENA_SESSION
-            </Button>
-          </div>
-
-          {/* Core Logs Panel */}
-          <div className="bg-cyber-surface border-2 border-cyber-border p-4 flex flex-col justify-between">
-            <div>
-              <div className="text-[11px] font-bold text-white border-b border-cyber-border pb-2 mb-3 tracking-widest">
-                SYSTEM_TELEMETRY_LOGS
-              </div>
-              <div className="space-y-3">
-                {systemLogs.map((log, i) => (
-                  <div key={i} className="text-[11px] font-mono text-cyber-neonGreen leading-tight opacity-85">
-                    {log}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="text-[9px] text-cyber-textMuted font-mono border-t border-cyber-border pt-2 mt-4">
-              SECURE SECURE ID: {session.id.substring(0, 12)}...
-            </div>
-          </div>
-
-        </div>
-      )}
     </div>
   );
 };

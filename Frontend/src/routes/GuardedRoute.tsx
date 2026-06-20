@@ -1,17 +1,25 @@
 import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { ScanlineLoader } from '../components/feedback/ScanlineLoader';
+import { APP_ROUTES } from '../config/constants';
 
-export const GuardedRoute: React.FC = () => {
+interface GuardedRouteProps {
+  children: React.JSX.Element;
+}
+
+export const GuardedRoute: React.FC<GuardedRouteProps> = ({ children }) => {
   const { user, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-cyber-bg flex items-center justify-center scanlines font-mono text-cyber-neonGreen text-sm tracking-widest">
-        LOADING_SECURE_METRICS...
-      </div>
-    );
+    return <ScanlineLoader statusMessage="VERIFYING_SECURITY_CONTEXT..." />;
   }
 
-  return user ? <Outlet /> : <Navigate to="/login" replace />;
+  if (!user) {
+    // Evict user to authentication hub panel while saving original target route location path link
+    return <Navigate to={APP_ROUTES.LOGIN} state={{ from: location }} replace />;
+  }
+
+  return children;
 };
