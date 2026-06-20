@@ -46,3 +46,5 @@ export const DSA_TIME_LIMIT_MS = {
 } as const;
 
 export const TECHNICAL_INTERVIEW_TIME_LIMIT_MS = 30 * 60 * 1000; // 30 minutes
+
+export const MISSED_SESSION_SWEEP_INTERVAL_MINUTES = 15;

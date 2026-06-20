@@ -1,16 +1,15 @@
 import { Schema, model, Document, Types } from 'mongoose';
 
-export interface IGithubSubmission extends Document {
+export interface ILinkedInDraft extends Document {
   user: Types.ObjectId;
   session: Types.ObjectId;
-  repositoryUrl: string;
-  commitUrl?: string;
-  notes?: string;
+  postText: string;
+  angle: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-const githubSubmissionSchema = new Schema<IGithubSubmission>(
+const linkedInDraftSchema = new Schema<ILinkedInDraft>(
   {
     user: {
       type: Schema.Types.ObjectId,
@@ -24,21 +23,16 @@ const githubSubmissionSchema = new Schema<IGithubSubmission>(
       required: true,
       index: true,
     },
-    repositoryUrl: {
+    postText: {
       type: String,
       required: true,
-      trim: true,
     },
-    commitUrl: {
+    angle: {
       type: String,
-      trim: true,
-    },
-    notes: {
-      type: String,
-      trim: true,
+      required: true,
     },
   },
   { timestamps: true }
 );
 
-export const GithubSubmission = model<IGithubSubmission>('GithubSubmission', githubSubmissionSchema);
+export const LinkedInDraft = model<ILinkedInDraft>('LinkedInDraft', linkedInDraftSchema);

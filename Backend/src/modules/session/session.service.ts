@@ -144,3 +144,12 @@ export const markSessionAsMissed = async (sessionId: string): Promise<ISession> 
 
   return session;
 };
+
+export const markEmailFailed = async (sessionId: string): Promise<ISession> => {
+  const session = await findSessionById(sessionId);
+  if (!session) throw new AppError('Session not found', 404);
+
+  session.emailFailed = true;
+  await session.save();
+  return session;
+};

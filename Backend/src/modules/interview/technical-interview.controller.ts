@@ -27,9 +27,9 @@ export const submitTechnical = catchAsync(async (req: Request, res: Response) =>
 export const getNextQuestion = catchAsync(async (req: Request, res: Response) => {
   const { interviewId } = req.params;
 
-  const { interview, question } = await getNextTechnicalQuestion(interviewId);
+  const { interview, question, timeExpired } = await getNextTechnicalQuestion(interviewId);
 
-  res.status(200).json({ success: true, data: { interview, question } });
+  res.status(200).json({ success: true, data: { interview, question, timeExpired } });
 });
 
 export const completeTechnical = catchAsync(async (req: Request, res: Response) => {
