@@ -1,13 +1,17 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export const GuardedRoute: React.FC = () => {
-  // Global auth logic hooks into this context state
-  const isAuthenticated = true; // Replace with dynamic verification check status
+  const { user, loading } = useAuth();
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-cyber-bg flex items-center justify-center scanlines font-mono text-cyber-neonGreen text-sm tracking-widest">
+        LOADING_SECURE_METRICS...
+      </div>
+    );
   }
 
-  return <Outlet />;
+  return user ? <Outlet /> : <Navigate to="/login" replace />;
 };
