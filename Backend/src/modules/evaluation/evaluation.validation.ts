@@ -15,3 +15,22 @@ export const dsaEvaluationSchema = z.object({
 });
 
 export type DsaEvaluationResult = z.infer<typeof dsaEvaluationSchema>;
+
+export const technicalAnswerEvaluationSchema = z.object({
+  score: z.number().min(0).max(100),
+  strengths: z.array(z.string()),
+  weaknesses: z.array(z.string()),
+  feedback: z.string().min(10),
+});
+
+export type TechnicalAnswerEvaluationResult = z.infer<typeof technicalAnswerEvaluationSchema>;
+
+export const technicalFinalSummarySchema = z.object({
+  overallScore: z.number().min(0).max(100),
+  strengths: z.array(z.string()),
+  weaknesses: z.array(z.string()),
+  areasForImprovement: z.array(z.string()),
+  feedback: z.string().min(10),
+});
+
+export type TechnicalFinalSummaryResult = z.infer<typeof technicalFinalSummarySchema>;

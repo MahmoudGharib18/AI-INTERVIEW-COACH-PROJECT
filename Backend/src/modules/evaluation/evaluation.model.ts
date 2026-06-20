@@ -22,7 +22,7 @@ const evaluationSchema = new Schema<IEvaluation>(
     submission: {
       type: Schema.Types.ObjectId,
       ref: 'Submission',
-      required: true,
+      required: false,
       index: true,
     },
     feedback: {
@@ -51,7 +51,7 @@ const evaluationSchema = new Schema<IEvaluation>(
     },
     correctness: {
       type: Boolean,
-      required: true,
+      required: false,
     },
     problemUnderstanding: {
       type: Number,
