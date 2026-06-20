@@ -6,6 +6,27 @@ import { MetricGrid } from '../features/dashboard/components/MetricGrid';
 import { ArenaHUD } from '../features/interview/components/ArenaHUD';
 import { GithubSync } from '../features/sync-launchpad/components/GithubSync';
 import { GuardedRoute } from './GuardedRoute';
+import { DSAArena } from '../features/interview/components/DSAArena';
+import { TechnicalTransition } from '../features/interview/components/TechnicalTransition';
+import { TechnicalArena } from '../features/interview/components/TechnicalArena';
+import { GithubSync } from '../features/sync-launchpad/components/GithubSync';
+import { MetricGrid } from '../features/dashboard/components/MetricGrid';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -14,6 +35,10 @@ export const AppRoutes: React.FC = () => {
         {/* Public Portal Space */}
         <Route path="/login" element={<AuthConsole isRegister={false} />} />
         <Route path="/register" element={<AuthConsole isRegister={true} />} />
+        <Route path="arena/dsa" element={<DSAArena />} />
+        <Route path="arena/technical-transition" element={<TechnicalTransition />} />
+        <Route path="arena/technical" element={<TechnicalArena />} />
+
 
         {/* Guarded Operational Sub-spaces */}
         <Route path="/" element={<GuardedRoute />}>
@@ -30,6 +55,16 @@ export const AppRoutes: React.FC = () => {
           <Route path="workspace/sync" element={
             <DashboardLayout streakCount={0}>
               <GithubSync />
+            </DashboardLayout>
+          } />
+          <Route path="workspace/sync" element={
+            <DashboardLayout streakCount={0}>
+              <GithubSync />
+            </DashboardLayout>
+          } />
+          <Route path="dashboard" element={
+            <DashboardLayout streakCount={0}>
+              <MetricGrid />
             </DashboardLayout>
           } />
         </Route>

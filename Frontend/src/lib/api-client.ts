@@ -1,6 +1,6 @@
-import axios from 'axios';
+import axios, { AxiosInstance, AxiosError } from 'axios';
 
-export const api = axios.create({
+export const api: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   withCredentials: true,
   headers: {
@@ -8,13 +8,13 @@ export const api = axios.create({
   },
 });
 
-// Interceptor to scrub operational data structure out of Axios shells
 api.interceptors.response.use(
   (response) => response.data,
-  (error) => {
+  (error: AxiosError<any>) => {
     const errorPayload = {
-      message: error.response?.data?.message || 'CRITICAL: Telemetry link down.',
+      message: error.response?.data?.message || 'CRITICAL_ERR: Telemetry bridge broken.',
       status: error.response?.status || 500,
+      success: false
     };
     return Promise.reject(errorPayload);
   }
