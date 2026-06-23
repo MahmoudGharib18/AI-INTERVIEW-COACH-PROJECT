@@ -1,10 +1,7 @@
+import { beginDailySession, finishDsaAndStartTechnical, finishTechnicalAndCompleteSession } from '#/modules/session/daily-session.service.js';
+import { catchAsync } from '#/shared/utils/catchAsync.js';
 import { Request, Response } from 'express';
-import { catchAsync } from '@/shared/utils/catchAsync';
-import {
-  beginDailySession,
-  finishDsaAndStartTechnical,
-  finishTechnicalAndCompleteSession,
-} from './daily-session.service';
+
 
 export const begin = catchAsync(async (req: Request, res: Response) => {
   const { sessionId } = req.params;

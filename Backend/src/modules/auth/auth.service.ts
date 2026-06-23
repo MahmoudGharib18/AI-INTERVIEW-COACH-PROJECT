@@ -1,9 +1,10 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import { User, IUser } from '@/modules/user/user.model';
-import { AppError } from '@/shared/errors/AppError';
-import { env } from '@/config/env';
-import { RegisterInput, LoginInput } from './auth.validation';
+import { env } from '#/config/env.js';
+import { LoginInput, RegisterInput } from '#/modules/auth/auth.validation.js';
+import { IUser, User } from '#/modules/user/user.model.js';
+import { AppError } from '#/shared/errors/AppError.js';
+
 
 const SALT_ROUNDS = 10;
 

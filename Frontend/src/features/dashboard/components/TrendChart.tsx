@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { api } from '../../../lib/api-client';
-import { TrendPoint } from '../../../types';
+import type { ApiResponse, TrendPoint } from '../../../types';
 
 export const TrendChart: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -10,17 +10,10 @@ export const TrendChart: React.FC = () => {
   useEffect(() => {
     const fetchTrendData = async () => {
       try {
-        const response: any = await api.get('/progress/trend');
-        if (response && response.data) {
-          setDataPoints(response.data);
-        }
-      } catch (err) {
-        // Fallback placeholder markers to ensure drawing logic doesn't crash on empty initial profile
-        setDataPoints([
-          { date: 'INIT_A', score: 50 },
-          { date: 'INIT_B', score: 65 },
-          { date: 'INIT_C', score: 85 }
-        ]);
+        const response = await api.get<ApiResponse<{ trend: TrendPoint[] }>>('/progress/trend');
+        setDataPoints(response.data.data.trend);
+      } catch {
+        setDataPoints([]);
       } finally {
         setLoading(false);
       }
@@ -29,20 +22,20 @@ export const TrendChart: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (loading || !canvasRef.current || dataPoints.length === 0) return;
+    if (loading || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Clear buffer allocation layout frame
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (dataPoints.length === 0) return;
 
     const padding = 40;
     const chartWidth = canvas.width - padding * 2;
     const chartHeight = canvas.height - padding * 2;
 
-    // Grid tracking outlines
     ctx.strokeStyle = '#26262b';
     ctx.lineWidth = 1;
     for (let i = 0; i <= 4; i++) {
@@ -53,14 +46,12 @@ export const TrendChart: React.FC = () => {
       ctx.stroke();
     }
 
-    // Map out vector path coordinate nodes
     const coordinates = dataPoints.map((point, index) => {
       const x = padding + (chartWidth / (dataPoints.length - 1 || 1)) * index;
-      const y = padding + chartHeight - (chartHeight * (point.score / 100));
-      return { x, y, ...point };
+      const y = padding + chartHeight - (chartHeight * (point.overallScore / 100));
+      return { x, y, score: point.overallScore };
     });
 
-    // Draw connecting lines path array
     ctx.strokeStyle = '#00ff66';
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -70,7 +61,6 @@ export const TrendChart: React.FC = () => {
     });
     ctx.stroke();
 
-    // Draw individual diagnostic point modules
     coordinates.forEach((coord) => {
       ctx.fillStyle = '#0a0a0c';
       ctx.strokeStyle = '#00ff66';
@@ -80,13 +70,11 @@ export const TrendChart: React.FC = () => {
       ctx.fill();
       ctx.stroke();
 
-      // Render score text strings above points
       ctx.fillStyle = '#ffffff';
       ctx.font = '10px monospace';
       ctx.textAlign = 'center';
       ctx.fillText(`${coord.score}%`, coord.x, coord.y - 8);
     });
-
   }, [dataPoints, loading]);
 
   if (loading) {
@@ -98,14 +86,20 @@ export const TrendChart: React.FC = () => {
       <div className="text-xs font-black tracking-widest text-white border-b border-[#26262b] pb-2 mb-4 uppercase">
         01 // SCORE_PERFORMANCE_TREND
       </div>
-      <div className="w-full overflow-x-auto">
-        <canvas 
-          ref={canvasRef} 
-          width={650} 
-          height={200} 
-          className="bg-[#0a0a0c] border border-[#26262b] block mx-auto"
-        />
-      </div>
+      {dataPoints.length === 0 ? (
+        <div className="h-48 flex items-center justify-center text-xs text-[#8a8a93] uppercase">
+          No completed sessions yet — trend will appear after your first session.
+        </div>
+      ) : (
+        <div className="w-full overflow-x-auto">
+          <canvas
+            ref={canvasRef}
+            width={650}
+            height={200}
+            className="bg-[#0a0a0c] border border-[#26262b] block mx-auto"
+          />
+        </div>
+      )}
     </div>
   );
 };

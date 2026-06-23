@@ -1,5 +1,5 @@
+import { EMAIL_QUEUE_NAME, bullConnection } from '#/jobs/queue.config.js';
 import { Queue } from 'bullmq';
-import { bullConnection, EMAIL_QUEUE_NAME } from '@/jobs/queue.config';
 
 export interface SessionReminderEmailJob {
   toEmail: string;

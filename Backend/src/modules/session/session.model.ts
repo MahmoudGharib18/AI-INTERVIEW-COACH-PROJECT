@@ -1,5 +1,5 @@
+import { SESSION_STATES, SessionState } from "#/config/constants.js";
 import { Schema, model, Document, Types } from "mongoose";
-import { SESSION_STATES, SessionState } from "@/config/constants";
 
 interface IInterviewSummary {
 	score: number;

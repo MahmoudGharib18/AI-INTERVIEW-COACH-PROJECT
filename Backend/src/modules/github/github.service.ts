@@ -1,9 +1,10 @@
+import { SESSION_STATES } from '#/config/constants.js';
+import { GithubSubmission, IGithubSubmission } from '#/modules/github/github.model.js';
+import { SubmitGithubInput } from '#/modules/github/github.validation.js';
+import { Session } from '#/modules/session/session.model.js';
+import { AppError } from '#/shared/errors/AppError.js';
 import { Types } from 'mongoose';
-import { GithubSubmission, IGithubSubmission } from './github.model';
-import { Session } from '@/modules/session/session.model';
-import { SESSION_STATES } from '@/config/constants';
-import { AppError } from '@/shared/errors/AppError';
-import { SubmitGithubInput } from './github.validation';
+
 
 export const submitGithubForSession = async (
   userId: Types.ObjectId,

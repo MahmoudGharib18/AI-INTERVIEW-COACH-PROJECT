@@ -1,5 +1,5 @@
+import { PROBLEM_DIFFICULTY } from '#/config/constants.js';
 import { z } from 'zod';
-import { PROBLEM_DIFFICULTY } from '@/config/constants';
 
 export const generatedProblemSchema = z.object({
   title: z.string().min(3),

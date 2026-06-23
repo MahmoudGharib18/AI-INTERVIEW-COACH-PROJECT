@@ -1,4 +1,4 @@
-import { IProblem } from "@/modules/problem/problem.model";
+import { IProblem } from "#/modules/problem/problem.model.js";
 
 export const DSA_EVALUATOR_SYSTEM_PROMPT = `You are evaluating a candidate's submitted solution to a coding interview problem. You are not the interviewer — you are a strict, fair code reviewer producing a structured assessment.
 

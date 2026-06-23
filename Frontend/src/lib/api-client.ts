@@ -1,21 +1,19 @@
-import axios, { AxiosInstance, AxiosError } from 'axios';
+import axios from "axios";
+import type { AxiosInstance } from "axios";
 
 export const api: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
-  withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+	baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api",
+	timeout: 15000,
+	withCredentials: true, // required for the httpOnly auth cookie
+	headers: {
+		"Content-Type": "application/json",
+	},
 });
 
 api.interceptors.response.use(
-  (response) => response.data,
-  (error: AxiosError<any>) => {
-    const errorPayload = {
-      message: error.response?.data?.message || 'CRITICAL_ERR: Telemetry bridge broken.',
-      status: error.response?.status || 500,
-      success: false
-    };
-    return Promise.reject(errorPayload);
-  }
+	(response) => response, // keep the full Axios response — callers read response.data.data
+	(error) => {
+		const fallbackMessage = error.response?.data?.message || "Network error — please try again.";
+		return Promise.reject(new Error(fallbackMessage));
+	},
 );

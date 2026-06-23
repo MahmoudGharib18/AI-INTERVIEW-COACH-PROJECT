@@ -1,5 +1,5 @@
-import { AIProvider, GenerateTextOptions, AIMessage } from '../ai-provider.interface';
-import { checkForLeak } from './leak-detector';
+import { AIMessage, AIProvider, GenerateTextOptions } from "#/ai/ai-provider.interface.js";
+import { checkForLeak } from "#/ai/guardrails/leak-detector.js";
 
 const FALLBACK_RESPONSE =
   "I can't provide hints, approaches, or solutions during the interview. I can repeat the problem statement or clarify wording if that helps.";

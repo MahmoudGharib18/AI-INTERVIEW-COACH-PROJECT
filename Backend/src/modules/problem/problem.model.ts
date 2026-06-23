@@ -1,5 +1,5 @@
+import { PROBLEM_DIFFICULTY, ProblemDifficulty } from '#/config/constants.js';
 import { Schema, model, Document } from 'mongoose';
-import { PROBLEM_DIFFICULTY, ProblemDifficulty } from '@/config/constants';
 
 export interface IProblem extends Document {
   title: string;

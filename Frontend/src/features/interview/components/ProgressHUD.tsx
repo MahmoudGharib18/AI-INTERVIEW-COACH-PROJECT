@@ -1,31 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { useInterval } from '../../../hooks/useInterval';
+import React from 'react';
+import { useCountdown } from '../hooks/useCountdown';
 
 interface ProgressHUDProps {
-  expiresAt: string;
+  durationSeconds: number;
   onTimeExpired: () => void;
   phaseLabel: string;
 }
 
-export const ProgressHUD: React.FC<ProgressHUDProps> = ({ expiresAt, onTimeExpired, phaseLabel }) => {
-  const calculateRemainingSeconds = (): number => {
-    const diff = Math.floor((new Date(expiresAt).getTime() - Date.now()) / 1000);
-    return diff > 0 ? diff : 0;
-  };
-
-  const [secondsLeft, setSecondsLeft] = useState<number>(calculateRemainingSeconds());
-
-  useEffect(() => {
-    setSecondsLeft(calculateRemainingSeconds());
-  }, [expiresAt]);
-
-  useInterval(() => {
-    const remaining = calculateRemainingSeconds();
-    setSecondsLeft(remaining);
-    if (remaining <= 0) {
-      onTimeExpired();
-    }
-  }, 1000);
+export const ProgressHUD: React.FC<ProgressHUDProps> = ({ durationSeconds, onTimeExpired, phaseLabel }) => {
+  const { secondsLeft } = useCountdown(durationSeconds, onTimeExpired);
 
   const formatClock = (totalSecs: number): string => {
     const mins = Math.floor(totalSecs / 60);
@@ -45,7 +28,7 @@ export const ProgressHUD: React.FC<ProgressHUDProps> = ({ expiresAt, onTimeExpir
           SYS_PHASE // <span className="text-white">{phaseLabel}</span>
         </span>
       </div>
-      
+
       <div className="flex items-baseline space-x-2">
         <span className="text-[9px] font-bold text-[#8a8a93]">EXEC_TIME_REMAINING:</span>
         <span className={`text-xl font-black tracking-tighter ${isCritical ? 'text-[#ff0033]' : 'text-[#00ff66]'}`}>

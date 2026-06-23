@@ -1,5 +1,5 @@
-import { SESSION_STATES, SessionState } from '@/config/constants';
-import { AppError } from '@/shared/errors/AppError';
+import { SESSION_STATES, SessionState } from "#/config/constants.js";
+import { AppError } from "#/shared/errors/AppError.js";
 
 // defines the only legal forward transitions
 const ALLOWED_TRANSITIONS: Record<SessionState, SessionState[]> = {

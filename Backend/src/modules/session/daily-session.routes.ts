@@ -1,6 +1,7 @@
+import { protect } from "#/middlewares/auth.middleware.js";
+import { advanceToTechnical, begin, finish } from "#/modules/session/daily-session.controller.js";
 import { Router } from "express";
-import { protect } from "@/middlewares/auth.middleware";
-import { begin, advanceToTechnical, finish } from "./daily-session.controller";
+
 
 const router = Router();
 

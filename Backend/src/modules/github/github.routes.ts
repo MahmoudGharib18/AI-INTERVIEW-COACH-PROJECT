@@ -1,8 +1,9 @@
+import { protect } from '#/middlewares/auth.middleware.js';
+import { validate } from '#/middlewares/validate.middleware.js';
+import { getGithubHistory, submitGithub } from '#/modules/github/github.controller.js';
+import { submitGithubSchema } from '#/modules/github/github.validation.js';
 import { Router } from 'express';
-import { protect } from '@/middlewares/auth.middleware';
-import { validate } from '@/middlewares/validate.middleware';
-import { submitGithubSchema } from './github.validation';
-import { submitGithub, getGithubHistory } from './github.controller';
+
 
 const router = Router();
 

@@ -1,5 +1,6 @@
-import { ProblemDifficulty } from "@/config/constants";
-import { IProblem } from "@/modules/problem/problem.model";
+import { ProblemDifficulty } from "#/config/constants.js";
+import { IProblem } from "#/modules/problem/problem.model.js";
+
 
 export const DSA_INTERVIEWER_SYSTEM_PROMPT = `You are a strict, experienced technical interviewer conducting a live DSA (Data Structures & Algorithms) interview.
 

@@ -2,18 +2,20 @@ import express, { Application } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import { env } from '@/config/env';
-import { errorHandler, notFoundHandler } from '@/middlewares/error.middleware';
+import { env } from './config/env.js';
+import { errorHandler, notFoundHandler } from './middlewares/error.middleware.js';
 
 // route imports
-import authRoutes from '@/modules/auth/auth.routes';
-import sessionRoutes from '@/modules/session/session.routes';
-import dailySessionRoutes from '@/modules/session/daily-session.routes';
-import dsaInterviewRoutes from '@/modules/interview/dsa-interview.routes';
-import technicalInterviewRoutes from '@/modules/interview/technical-interview.routes';
-import progressRoutes from '@/modules/progress/progress.routes';
-import githubRoutes from '@/modules/github/github.routes';
-import linkedinRoutes from '@/modules/linkedin/linkedin.routes';
+import authRoutes from './modules/auth/auth.routes.js';
+import sessionRoutes from './modules/session/session.routes.js';
+import dailySessionRoutes from './modules/session/daily-session.routes.js';
+import dsaInterviewRoutes from './modules/interview/dsa-interview.routes.js';
+import technicalInterviewRoutes from './modules/interview/technical-interview.routes.js';
+import progressRoutes from './modules/progress/progress.routes.js';
+import githubRoutes from './modules/github/github.routes.js';
+import linkedinRoutes from './modules/linkedin/linkedin.routes.js';
+import userRoutes from './modules/user/user.routes.js';
+
 
 export const app: Application = express();
 
@@ -42,6 +44,7 @@ app.use('/api/technical-interview', technicalInterviewRoutes);
 app.use('/api/progress', progressRoutes);
 app.use('/api/github', githubRoutes);
 app.use('/api/linkedin', linkedinRoutes);
+app.use('/api/user', userRoutes);
 
 // --- 404 + error handling (must be last, in this order) ---
 app.use(notFoundHandler);

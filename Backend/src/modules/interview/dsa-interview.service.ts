@@ -1,15 +1,14 @@
+import { getAIProvider } from "#/ai/ai.factory.js";
+import { safeGenerateText } from "#/ai/guardrails/safe-generate.js";
+import { DSA_INTERVIEWER_SYSTEM_PROMPT, buildClarificationContext, buildProblemPresentationMessage } from "#/ai/prompts/dsa-interviewer.prompt.js";
+import { DSA_TIME_LIMIT_MS, INTERVIEW_TYPES, ProblemDifficulty, SUBMISSION_SOURCES } from "#/config/constants.js";
+import { evaluateDsaSubmission } from "#/modules/evaluation/evaluation.service.js";
+import { IInterview, Interview } from "#/modules/interview/interview.model.js";
+import { IProblem } from "#/modules/problem/problem.model.js";
+import { generateDailyProblemSet } from "#/modules/problem/problem.service.js";
+import { createSubmission } from "#/modules/submission/submission.service.js";
+import { AppError } from "#/shared/errors/AppError.js";
 import { Types } from "mongoose";
-import { Interview, IInterview } from "./interview.model";
-import { generateDailyProblemSet } from "@/modules/problem/problem.service";
-import { createSubmission } from "@/modules/submission/submission.service";
-import { evaluateDsaSubmission } from "@/modules/evaluation/evaluation.service";
-import { IProblem } from "@/modules/problem/problem.model";
-import { INTERVIEW_TYPES, SUBMISSION_SOURCES, DSA_TIME_LIMIT_MS, ProblemDifficulty } from "@/config/constants";
-import { AppError } from "@/shared/errors/AppError";
-import { buildProblemPresentationMessage } from "@/ai/prompts/dsa-interviewer.prompt";
-import { getAIProvider } from "@/ai/ai.factory";
-import { safeGenerateText } from "@/ai/guardrails/safe-generate";
-import { DSA_INTERVIEWER_SYSTEM_PROMPT, buildClarificationContext } from "@/ai/prompts/dsa-interviewer.prompt";
 
 export const startDsaInterview = async (sessionId: Types.ObjectId): Promise<{ interview: IInterview; problems: IProblem[] }> => {
 	const { easy, medium, hard } = await generateDailyProblemSet();
@@ -107,4 +106,34 @@ export const askDsaClarification = async (interviewId: string, questionIndex: nu
 	await interview.save();
 
 	return { response: result.text, wasFlagged: result.wasFlagged };
+};
+
+export const getDsaInterviewById = async (interviewId: string): Promise<IInterview> => {
+	const interview = await Interview.findById(interviewId).populate("questions.evaluation");
+	if (!interview) throw new AppError("Interview not found", 404);
+	return interview;
+};
+
+export const completeDsaInterview = async (interviewId: string): Promise<IInterview> => {
+	const interview = await Interview.findById(interviewId).populate("questions.evaluation");
+	if (!interview) throw new AppError("Interview not found", 404);
+
+	const evaluations = interview.questions.map((q) => q.evaluation as any).filter(Boolean);
+
+	if (evaluations.length !== interview.questions.length) {
+		throw new AppError("Cannot complete DSA interview — not all problems have been submitted", 400);
+	}
+
+	const avgScore = Math.round(evaluations.reduce((sum, e) => sum + e.score, 0) / evaluations.length);
+
+	// const allStrengths = evaluations.flatMap((e) => e.strengths);
+	// const allWeaknesses = evaluations.flatMap((e) => e.weaknesses);
+	const combinedFeedback = evaluations.map((e) => e.feedback).join(" ");
+
+	interview.overallScore = avgScore;
+	interview.overallFeedback = combinedFeedback;
+	interview.completedAt = new Date();
+	await interview.save();
+
+	return interview;
 };

@@ -1,11 +1,7 @@
+import { protect } from '#/middlewares/auth.middleware.js';
+import { getActiveSession, getHistory, getSession, openSession } from '#/modules/session/session.controller.js';
 import { Router } from 'express';
-import { protect } from '@/middlewares/auth.middleware';
-import {
-  openSession,
-  getSession,
-  getActiveSession,
-  getHistory,
-} from './session.controller';
+
 
 const router = Router();
 

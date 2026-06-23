@@ -1,6 +1,7 @@
-import { findPendingSessionsPastWindow } from '@/modules/session/session.repository';
-import { markSessionAsMissed } from '@/modules/session/session.service';
-import { getLateWindowMs } from '@/shared/utils/time';
+import { findPendingSessionsPastWindow } from "#/modules/session/session.repository.js";
+import { markSessionAsMissed } from "#/modules/session/session.service.js";
+import { getLateWindowMs } from "#/shared/utils/time.js";
+
 
 /**
  * Runs every 15 minutes. Finds sessions whose 3-hour window has fully elapsed

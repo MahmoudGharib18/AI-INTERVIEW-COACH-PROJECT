@@ -1,11 +1,11 @@
+import { SESSION_STATES, SessionState } from "#/config/constants.js";
+import { ISession } from "#/modules/session/session.model.js";
+import { createSession, findActiveSessionForUser, findSessionById, findSessionHistoryForUser } from "#/modules/session/session.repository.js";
+import { assertTransition } from "#/modules/session/session.state-machine.js";
+import { User } from "#/modules/user/user.model.js";
+import { AppError } from "#/shared/errors/AppError.js";
+import { isWithinLateWindow } from "#/shared/utils/time.js";
 import { Types } from "mongoose";
-import { ISession } from "./session.model";
-import { User } from "@/modules/user/user.model";
-import { createSession, findSessionById, findActiveSessionForUser, findSessionHistoryForUser } from "./session.repository";
-import { assertTransition } from "./session.state-machine";
-import { SESSION_STATES, SessionState } from "@/config/constants";
-import { AppError } from "@/shared/errors/AppError";
-import { isWithinLateWindow } from "@/shared/utils/time";
 
 export const scheduleSessionForUser = async (userId: Types.ObjectId, scheduledTime: Date): Promise<ISession> => {
 	return createSession(userId, scheduledTime);
@@ -74,36 +74,36 @@ export const advanceToTechnicalInProgress = async (sessionId: string): Promise<I
 };
 
 export const completeSession = async (
-  sessionId: string,
-  result: {
-    overallScore: number;
-    summary: string;
-    improvementSuggestions: string[];
-    dsaSummary: ISession['dsaSummary'];
-    technicalSummary: ISession['technicalSummary'];
-  }
+	sessionId: string,
+	result: {
+		overallScore: number;
+		summary: string;
+		improvementSuggestions: string[];
+		dsaSummary: ISession["dsaSummary"];
+		technicalSummary: ISession["technicalSummary"];
+	},
 ): Promise<ISession> => {
-  const session = await findSessionById(sessionId);
-  if (!session) throw new AppError('Session not found', 404);
+	const session = await findSessionById(sessionId);
+	if (!session) throw new AppError("Session not found", 404);
 
-  assertTransition(session.status as SessionState, SESSION_STATES.COMPLETED);
+	assertTransition(session.status as SessionState, SESSION_STATES.COMPLETED);
 
-  session.status = SESSION_STATES.COMPLETED;
-  session.completedTime = new Date();
-  session.overallScore = result.overallScore;
-  session.summary = result.summary;
-  session.improvementSuggestions = result.improvementSuggestions;
-  session.dsaSummary = result.dsaSummary;
-  session.technicalSummary = result.technicalSummary;
-  await session.save();
+	session.status = SESSION_STATES.COMPLETED;
+	session.completedTime = new Date();
+	session.overallScore = result.overallScore;
+	session.summary = result.summary;
+	session.improvementSuggestions = result.improvementSuggestions;
+	session.dsaSummary = result.dsaSummary;
+	session.technicalSummary = result.technicalSummary;
+	await session.save();
 
-  // streak only increments on completion — a late-but-completed session
-  // still grows the streak; only a missed session breaks it
-  await User.findByIdAndUpdate(session.user, {
-    $inc: { streakCount: 1, totalSessions: 1 },
-  });
+	// streak only increments on completion — a late-but-completed session
+	// still grows the streak; only a missed session breaks it
+	await User.findByIdAndUpdate(session.user, {
+		$inc: { streakCount: 1, totalSessions: 1 },
+	});
 
-  return session;
+	return session;
 };
 
 export const getSessionForUser = async (sessionId: string, userId: string): Promise<ISession> => {
@@ -125,31 +125,31 @@ export const getSessionHistoryForUser = async (userId: Types.ObjectId): Promise<
 	return findSessionHistoryForUser(userId);
 };
 
-export const markSessionAsMissed = async (sessionId: string): Promise<ISession> => {
-  const session = await findSessionById(sessionId);
-  if (!session) throw new AppError('Session not found', 404);
+export const markEmailFailed = async (sessionId: string): Promise<ISession> => {
+	const session = await findSessionById(sessionId);
+	if (!session) throw new AppError("Session not found", 404);
 
-  if (session.isMissed || session.status === SESSION_STATES.COMPLETED) {
-    return session; // already resolved, nothing to do — safe to call repeatedly
-  }
-
-  session.isMissed = true;
-  await session.save();
-
-  // missed session breaks the streak and counts against the user
-  await User.findByIdAndUpdate(session.user, {
-    $inc: { missedCount: 1, totalSessions: 1 },
-    $set: { streakCount: 0 },
-  });
-
-  return session;
+	session.emailFailed = true;
+	await session.save();
+	return session;
 };
 
-export const markEmailFailed = async (sessionId: string): Promise<ISession> => {
-  const session = await findSessionById(sessionId);
-  if (!session) throw new AppError('Session not found', 404);
+export const markSessionAsMissed = async (sessionId: string): Promise<ISession> => {
+	const session = await findSessionById(sessionId);
+	if (!session) throw new AppError("Session not found", 404);
 
-  session.emailFailed = true;
-  await session.save();
-  return session;
+	if (session.isMissed || session.status === SESSION_STATES.COMPLETED) {
+		return session; // already resolved, nothing to do — safe to call repeatedly
+	}
+
+	session.isMissed = true;
+	await session.save();
+
+	// missed session breaks the streak and counts against the user
+	await User.findByIdAndUpdate(session.user, {
+		$inc: { missedCount: 1, totalSessions: 1 },
+		$set: { streakCount: 0 },
+	});
+
+	return session;
 };

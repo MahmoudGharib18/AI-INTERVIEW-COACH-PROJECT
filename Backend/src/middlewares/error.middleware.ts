@@ -1,6 +1,7 @@
+import { env } from '#/config/env.js';
+import { AppError } from '#/shared/errors/AppError.js';
 import { Request, Response, NextFunction } from 'express';
-import { AppError } from '@/shared/errors/AppError';
-import { env } from '@/config/env';
+
 
 export const errorHandler = (
   err: Error,

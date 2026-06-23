@@ -1,8 +1,9 @@
+import { SESSION_STATES } from '#/config/constants.js';
+import { Session } from '#/modules/session/session.model.js';
+import { User } from '#/modules/user/user.model.js';
+import { AppError } from '#/shared/errors/AppError.js';
 import { Types } from 'mongoose';
-import { User } from '@/modules/user/user.model';
-import { Session } from '@/modules/session/session.model';
-import { AppError } from '@/shared/errors/AppError';
-import { SESSION_STATES } from '@/config/constants';
+
 
 export interface ProgressOverview {
   streakCount: number;

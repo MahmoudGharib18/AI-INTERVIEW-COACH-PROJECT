@@ -1,6 +1,7 @@
+import { getGithubSubmissionsForUser, submitGithubForSession } from '#/modules/github/github.service.js';
+import { catchAsync } from '#/shared/utils/catchAsync.js';
 import { Request, Response } from 'express';
-import { catchAsync } from '@/shared/utils/catchAsync';
-import { submitGithubForSession, getGithubSubmissionsForUser } from './github.service';
+
 
 export const submitGithub = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user!._id;

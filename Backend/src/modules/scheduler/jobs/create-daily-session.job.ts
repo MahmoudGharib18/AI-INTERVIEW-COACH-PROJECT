@@ -1,6 +1,7 @@
-import { User } from '@/modules/user/user.model';
-import { scheduleSessionForUser } from '@/modules/session/session.service';
-import { enqueueSessionReminderEmail } from '@/modules/scheduler/email.queue';
+import { enqueueSessionReminderEmail } from "#/modules/scheduler/email.queue.js";
+import { scheduleSessionForUser } from "#/modules/session/session.service.js";
+import { User } from "#/modules/user/user.model.js";
+
 
 export const runCreateDailySessionJob = async (): Promise<void> => {
   const now = new Date();

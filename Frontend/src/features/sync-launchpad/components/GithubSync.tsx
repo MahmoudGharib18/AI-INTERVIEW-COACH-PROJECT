@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { api } from '../../../lib/api-client';
 import { Input } from '../../../components/ui/Input';
 import { Button } from '../../../components/ui/Button';
+import type { ApiResponse } from '../../../types';
 
 interface GithubSyncProps {
+  sessionId: string;
   onSyncComplete: (message: string, type: 'success' | 'error') => void;
 }
 
-export const GithubSync: React.FC<GithubSyncProps> = ({ onSyncComplete }) => {
+export const GithubSync: React.FC<GithubSyncProps> = ({ sessionId, onSyncComplete }) => {
   const [repoUrl, setRepoUrl] = useState('');
   const [commitUrl, setCommitUrl] = useState('');
   const [notes, setNotes] = useState('');
@@ -19,18 +21,19 @@ export const GithubSync: React.FC<GithubSyncProps> = ({ onSyncComplete }) => {
 
     setSyncing(true);
     try {
-      // Maps directly to POST /api/workspace/github/sync matching API_REFERENCE.md and github.model.ts
-      await api.post('/workspace/github/sync', {
+      await api.post<ApiResponse<unknown>>('/github', {
+        sessionId,
         repositoryUrl: repoUrl,
         commitUrl: commitUrl || undefined,
-        notes: notes || undefined
+        notes: notes || undefined,
       });
-      
-      onSyncComplete('GITHUB_TELEMETRY_LINKED_SUCCESSFULLY', 'success');
+
+      onSyncComplete('GitHub link saved successfully.', 'success');
+      setRepoUrl('');
       setCommitUrl('');
       setNotes('');
     } catch (err: any) {
-      onSyncComplete(err.message || 'GIT_SYNC_PIPELINE_FAULT', 'error');
+      onSyncComplete(err.message || 'Failed to save GitHub link.', 'error');
     } finally {
       setSyncing(false);
     }
@@ -41,7 +44,7 @@ export const GithubSync: React.FC<GithubSyncProps> = ({ onSyncComplete }) => {
       <div className="text-xs font-black tracking-widest text-[#00ff66] border-b border-[#26262b] pb-2 mb-4 uppercase">
         01 // GIT_COMMIT_PIPELINE_SYNC
       </div>
-      
+
       <form onSubmit={handleSyncTransmission} className="space-y-4">
         <Input
           label="Target Repository Link (MANDATORY)"
@@ -71,13 +74,13 @@ export const GithubSync: React.FC<GithubSyncProps> = ({ onSyncComplete }) => {
             disabled={syncing}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="Document sub-agent optimizations or query-planning refactors executed during this track run..."
+            placeholder="Document optimizations or refactors executed during this session..."
             className="w-full bg-[#0a0a0c] border-2 border-[#26262b] focus:border-[#00ff66] focus:outline-none p-2.5 font-mono text-xs text-white resize-none"
           />
         </div>
 
         <Button type="submit" variant="neon" className="w-full" disabled={syncing || !repoUrl.trim()}>
-          {syncing ? 'TRANSMITTING_VECTORS...' : 'ENGAGE_REPOSITORY_SYNC'}
+          {syncing ? 'TRANSMITTING...' : 'ENGAGE_REPOSITORY_SYNC'}
         </Button>
       </form>
     </div>

@@ -1,6 +1,7 @@
+import { protect } from '#/middlewares/auth.middleware.js';
+import { getOverview, getTrend, getWeaknesses } from '#/modules/progress/progress.controller.js';
 import { Router } from 'express';
-import { protect } from '@/middlewares/auth.middleware';
-import { getOverview, getTrend } from './progress.controller';
+
 
 const router = Router();
 

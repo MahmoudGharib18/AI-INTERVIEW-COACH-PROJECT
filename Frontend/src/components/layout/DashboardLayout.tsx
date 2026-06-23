@@ -15,7 +15,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, stre
   const navItems = [
     { label: 'COMMAND_CENTER', path: APP_ROUTES.DASHBOARD, idx: '01' },
     { label: 'INTERVIEW_ARENA', path: APP_ROUTES.ARENA_GATEKEEPER, idx: '02' },
-    { label: 'SYNC_LAUNCHPAD', path: APP_ROUTES.SYNC_LAUNCHPAD, idx: '03' }
+    { label: 'SYNC_LAUNCHPAD', path: APP_ROUTES.SYNC_LAUNCHPAD, idx: '03' },
+    { label: 'OPERATOR_SETTINGS', path: APP_ROUTES.SETTINGS, idx: '04' },
   ];
 
   return (
@@ -28,7 +29,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, stre
               <span className="font-black tracking-wider text-xs text-white">SYS//ORCHESTRATOR</span>
             </div>
           </div>
-          
+
           <nav className="space-y-1.5">
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
@@ -36,11 +37,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, stre
                 <button
                   key={item.path}
                   onClick={() => navigate(item.path)}
-                  className={`w-full flex items-center space-x-3 p-2.5 text-left border transition-all duration-150 group font-mono ${
-                    isActive 
-                      ? 'border-[#00ff66] bg-[#0a0a0c] text-white' 
+                  className={`w-full flex items-center space-x-3 p-2.5 text-left border transition-all duration-150 group font-mono ${isActive
+                      ? 'border-[#00ff66] bg-[#0a0a0c] text-white'
                       : 'border-transparent text-[#8a8a93] hover:border-[#26262b] hover:bg-[#0a0a0c] hover:text-white'
-                  }`}
+                    }`}
                 >
                   <span className={isActive ? 'text-[#00ff66]' : 'text-[#26262b] group-hover:text-[#8a8a93]'}>
                     {item.idx}//
@@ -63,7 +63,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, stre
             </div>
           </div>
 
-          <button 
+          <button
             onClick={onLogout}
             className="w-full text-left font-mono text-[10px] font-bold text-[#8a8a93] hover:text-[#ff0033] p-1 transition-colors uppercase tracking-widest"
           >

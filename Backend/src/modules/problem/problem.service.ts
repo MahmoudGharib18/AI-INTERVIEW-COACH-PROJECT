@@ -1,8 +1,9 @@
-import { getAIProvider } from '@/ai/ai.factory';
-import { Problem, IProblem } from './problem.model';
-import { generatedProblemSchema } from './problem.validation';
-import { buildProblemGenerationPrompt } from '@/ai/prompts/dsa-interviewer.prompt';
-import { ProblemDifficulty } from '@/config/constants';
+import { getAIProvider } from "#/ai/ai.factory.js";
+import { buildProblemGenerationPrompt } from "#/ai/prompts/dsa-interviewer.prompt.js";
+import { ProblemDifficulty } from "#/config/constants.js";
+import { IProblem, Problem } from "#/modules/problem/problem.model.js";
+import { generatedProblemSchema } from "#/modules/problem/problem.validation.js";
+
 
 export const generateProblem = async (
   difficulty: ProblemDifficulty

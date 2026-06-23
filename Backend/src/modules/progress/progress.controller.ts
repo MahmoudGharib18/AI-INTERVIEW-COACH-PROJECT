@@ -1,6 +1,7 @@
+import { getProgressOverview, getScoreTrend, getWeaknessFrequency } from '#/modules/progress/progress.service.js';
+import { catchAsync } from '#/shared/utils/catchAsync.js';
 import { Request, Response } from 'express';
-import { catchAsync } from '@/shared/utils/catchAsync';
-import { getProgressOverview, getScoreTrend } from './progress.service';
+
 
 export const getOverview = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user!._id;

@@ -1,5 +1,6 @@
-import { Queue, Worker, ConnectionOptions } from 'bullmq';
-import { redisClient } from '@/config/redis';
+import { redisClient } from '#/config/redis.js';
+import { ConnectionOptions } from 'bullmq';
+
 
 // BullMQ wants its own connection config shape, but reusing the same
 // underlying Redis instance the rest of the app already connects to

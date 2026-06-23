@@ -1,9 +1,10 @@
+import { env } from '#/config/env.js';
+import { User } from '#/modules/user/user.model.js';
+import { AppError } from '#/shared/errors/AppError.js';
+import { catchAsync } from '#/shared/utils/catchAsync.js';
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { User } from '@/modules/user/user.model';
-import { AppError } from '@/shared/errors/AppError';
-import { catchAsync } from '@/shared/utils/catchAsync';
-import { env } from '@/config/env';
+
 
 interface JwtPayload {
   userId: string;

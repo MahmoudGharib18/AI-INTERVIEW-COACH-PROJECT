@@ -1,5 +1,5 @@
+import { INTERVIEW_TYPES, InterviewType } from '#/config/constants.js';
 import { Schema, model, Document, Types } from 'mongoose';
-import { INTERVIEW_TYPES, InterviewType } from '@/config/constants';
 
 interface IClarificationExchange {
   question: string;

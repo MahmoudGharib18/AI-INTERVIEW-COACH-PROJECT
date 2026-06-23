@@ -1,5 +1,5 @@
+import { SUBMISSION_SOURCES, SubmissionSource } from '#/config/constants.js';
 import { Schema, model, Document, Types } from 'mongoose';
-import { SUBMISSION_SOURCES, SubmissionSource } from '@/config/constants';
 
 export interface ISubmission extends Document {
   user: Types.ObjectId;

@@ -1,4 +1,5 @@
-import { Session, ISession } from "./session.model";
+import { SESSION_STATES } from "#/config/constants.js";
+import { ISession, Session } from "#/modules/session/session.model.js";
 import { Types } from "mongoose";
 
 export const createSession = async (userId: Types.ObjectId, scheduledTime: Date): Promise<ISession> => {

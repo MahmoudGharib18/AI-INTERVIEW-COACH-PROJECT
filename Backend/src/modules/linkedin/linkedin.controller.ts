@@ -1,6 +1,6 @@
+import { generateLinkedInDraft, getLinkedInDraftsForUser } from '#/modules/linkedin/linkedin.service.js';
+import { catchAsync } from '#/shared/utils/catchAsync.js';
 import { Request, Response } from 'express';
-import { catchAsync } from '@/shared/utils/catchAsync';
-import { generateLinkedInDraft, getLinkedInDraftsForUser } from './linkedin.service';
 
 export const createDraft = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user!._id;

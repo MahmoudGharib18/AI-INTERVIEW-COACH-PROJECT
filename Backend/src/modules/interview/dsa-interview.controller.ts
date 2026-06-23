@@ -1,13 +1,9 @@
+import { askDsaClarification, completeDsaInterview, getDsaInterviewById, startDsaInterview, submitDsaAnswer } from '#/modules/interview/dsa-interview.service.js';
+import { Problem } from '#/modules/problem/problem.model.js';
+import { AppError } from '#/shared/errors/AppError.js';
+import { catchAsync } from '#/shared/utils/catchAsync.js';
 import { Request, Response } from 'express';
-import { catchAsync } from '@/shared/utils/catchAsync';
-import { AppError } from '@/shared/errors/AppError';
-import { Problem } from '@/modules/problem/problem.model';
-import {
-  startDsaInterview,
-  submitDsaAnswer,
-  completeDsaInterview,
-  askDsaClarification,
-} from './dsa-interview.service';
+
 
 export const startDsa = catchAsync(async (req: Request, res: Response) => {
   const { sessionId } = req.body;
@@ -62,4 +58,12 @@ export const askClarification = catchAsync(async (req: Request, res: Response) =
   const result = await askDsaClarification(interviewId, questionIndex, problem, candidateQuestion);
 
   res.status(200).json({ success: true, data: result });
+});
+
+export const getDsa = catchAsync(async (req: Request, res: Response) => {
+  const { interviewId } = req.params;
+
+  const interview = await getDsaInterviewById(interviewId);
+
+  res.status(200).json({ success: true, data: { interview } });
 });

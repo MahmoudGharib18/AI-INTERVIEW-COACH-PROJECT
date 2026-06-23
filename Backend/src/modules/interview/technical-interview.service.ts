@@ -1,12 +1,13 @@
+import { getAIProvider } from "#/ai/ai.factory.js";
+import { safeGenerateText } from "#/ai/guardrails/safe-generate.js";
+import { TECHNICAL_INTERVIEWER_SYSTEM_PROMPT, buildNextQuestionPrompt } from "#/ai/prompts/technical-interviewer.prompt.js";
+import { INTERVIEW_TYPES, TECHNICAL_INTERVIEW_TIME_LIMIT_MS } from "#/config/constants.js";
+import { IEvaluation } from "#/modules/evaluation/evaluation.model.js";
+import { evaluateTechnicalAnswer, generateTechnicalFinalSummary } from "#/modules/evaluation/evaluation.service.js";
+import { IInterview, Interview } from "#/modules/interview/interview.model.js";
+import { AppError } from "#/shared/errors/AppError.js";
 import { Types } from "mongoose";
-import { Interview, IInterview } from "./interview.model";
-import { getAIProvider } from "@/ai/ai.factory";
-import { safeGenerateText } from "@/ai/guardrails/safe-generate";
-import { TECHNICAL_INTERVIEWER_SYSTEM_PROMPT, buildNextQuestionPrompt } from "@/ai/prompts/technical-interviewer.prompt";
-import { evaluateTechnicalAnswer, generateTechnicalFinalSummary } from "@/modules/evaluation/evaluation.service";
-import { INTERVIEW_TYPES } from "@/config/constants";
-import { AppError } from "@/shared/errors/AppError";
-import { TECHNICAL_INTERVIEW_TIME_LIMIT_MS } from "@/config/constants";
+
 
 export const startTechnicalInterview = async (sessionId: Types.ObjectId): Promise<IInterview> => {
 	const provider = getAIProvider();
@@ -123,4 +124,11 @@ export const completeTechnicalInterview = async (interviewId: string): Promise<I
 	await interview.save();
 
 	return interview;
+};
+
+
+export const getTechnicalInterviewById = async (interviewId: string): Promise<IInterview> => {
+  const interview = await Interview.findById(interviewId).populate('questions.evaluation');
+  if (!interview) throw new AppError('Interview not found', 404);
+  return interview;
 };

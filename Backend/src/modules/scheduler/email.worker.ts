@@ -1,8 +1,9 @@
+import { EMAIL_QUEUE_NAME, bullConnection } from '#/jobs/queue.config.js';
+import { SessionReminderEmailJob } from '#/modules/scheduler/email.queue.js';
+import { sendSessionReminderEmail } from '#/modules/scheduler/email.service.js';
+import { markEmailFailed, markEmailSent } from '#/modules/session/session.service.js';
 import { Worker, Job } from 'bullmq';
-import { bullConnection, EMAIL_QUEUE_NAME } from '@/jobs/queue.config';
-import { sendSessionReminderEmail } from './email.service';
-import { SessionReminderEmailJob } from './email.queue';
-import { markEmailSent, markEmailFailed } from '@/modules/session/session.service';
+
 
 export const startEmailWorker = (): Worker => {
   const worker = new Worker<SessionReminderEmailJob>(

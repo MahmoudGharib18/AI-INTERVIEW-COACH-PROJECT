@@ -14,8 +14,8 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(10, 'JWT_SECRET must be at least 10 characters'),
   JWT_EXPIRES_IN: z.string().default('7d'),
 
-  AI_PROVIDER: z.enum(['openai', 'anthropic']).default('openai'),
-  OPENAI_API_KEY: z.string().min(1, 'OPENAI_API_KEY is required'),
+  AI_PROVIDER: z.enum(['gemini', 'anthropic']).default('gemini'),
+  GOOGLE_API_KEY: z.string().min(1, 'GOOGLE is required'),
 
   SMTP_HOST: z.string().min(1),
   SMTP_PORT: z.coerce.number(),

@@ -1,4 +1,4 @@
-import { env } from '@/config/env';
+import { env } from "#/config/env.js";
 
 const HOUR_MS = 60 * 60 * 1000;
 
