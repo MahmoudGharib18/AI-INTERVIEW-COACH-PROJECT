@@ -1,7 +1,8 @@
+import { Button } from '@/components/ui/Button.tsx';
+import { api } from '@/lib/api-client.ts';
+import type { ApiResponse } from '@/types/index.ts';
 import React, { useState, useEffect } from 'react';
-import { api } from '../../../lib/api-client';
-import { Button } from '../../../components/ui/Button';
-import type { ApiResponse, LinkedInDraft as LinkedInDraftType } from '../../../types';
+
 
 interface LinkedinDraftProps {
   sessionId: string;

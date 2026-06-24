@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/Button.tsx';
+import { APP_ROUTES, DSA_TIME_LIMITS_SECONDS } from '@/config/constants.ts';
+import { DSAArena, TechnicalArena } from '@/features/interview/index.ts';
+import { dsaService } from '@/features/interview/services/dsa.ts';
+import { technicalService } from '@/features/interview/services/technical.ts';
+import { sessionService } from '@/features/session/services/session.ts';
+import type { Problem, Session } from '@/types/index.ts';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { sessionService } from '../services/session';
-import { dsaService } from '../../interview/services/dsa';
-import { technicalService } from '../../interview/services/technical';
-import { DSAArena } from '../../interview/components/DSAArena';
-import { TechnicalArena } from '../../interview/components/TechnicalArena';
-import { Button } from '../../../components/ui/Button';
-import { APP_ROUTES, DSA_TIME_LIMITS_SECONDS } from '../../../config/constants';
-import type { Session, Problem } from '../../../types';
+
 
 type GateView = 'loading' | 'no-session' | 'dsa' | 'technical' | 'completed' | 'missed' | 'error';
 
@@ -18,6 +18,7 @@ interface ResumedDsaState {
 
 export const SessionGate: React.FC = () => {
   const navigate = useNavigate();
+  const hasLoadedRef = useRef(false);
   const [view, setView] = useState<GateView>('loading');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -30,6 +31,8 @@ export const SessionGate: React.FC = () => {
   const [firstQuestion, setFirstQuestion] = useState<string | null>(null);
 
   useEffect(() => {
+    if (hasLoadedRef.current) return;
+    hasLoadedRef.current = true;
     const loadSession = async () => {
       try {
         const res = await sessionService.getActive();

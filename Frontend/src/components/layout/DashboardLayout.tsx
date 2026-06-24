@@ -1,6 +1,8 @@
+import { APP_ROUTES } from '@/config/constants.ts';
+import { useTour } from '@/context/TourContext.tsx';
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { APP_ROUTES } from '../../config/constants';
+
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -11,12 +13,13 @@ interface DashboardLayoutProps {
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, streakCount, onLogout }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { startTour } = useTour();
 
   const navItems = [
-    { label: 'COMMAND_CENTER', path: APP_ROUTES.DASHBOARD, idx: '01' },
-    { label: 'INTERVIEW_ARENA', path: APP_ROUTES.ARENA_GATEKEEPER, idx: '02' },
-    { label: 'SYNC_LAUNCHPAD', path: APP_ROUTES.SYNC_LAUNCHPAD, idx: '03' },
-    { label: 'OPERATOR_SETTINGS', path: APP_ROUTES.SETTINGS, idx: '04' },
+    { label: 'COMMAND_CENTER', path: APP_ROUTES.DASHBOARD, idx: '01', tourId: 'tour-nav-dashboard' },
+    { label: 'INTERVIEW_ARENA', path: APP_ROUTES.ARENA_GATEKEEPER, idx: '02', tourId: 'tour-nav-arena' },
+    { label: 'SYNC_LAUNCHPAD', path: APP_ROUTES.SYNC_LAUNCHPAD, idx: '03', tourId: 'tour-nav-sync' },
+    { label: 'OPERATOR_SETTINGS', path: APP_ROUTES.SETTINGS, idx: '04', tourId: 'tour-nav-settings' },
   ];
 
   return (
@@ -28,6 +31,13 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, stre
               <div className="w-2.5 h-2.5 bg-[#00ff66] rounded-full animate-pulse" />
               <span className="font-black tracking-wider text-xs text-white">SYS//ORCHESTRATOR</span>
             </div>
+            <button
+              onClick={startTour}
+              title="Replay platform guide"
+              className="text-[9px] border border-[#26262b] hover:border-[#00ff66] text-[#8a8a93] hover:text-[#00ff66] px-2 py-1 uppercase font-bold tracking-widest transition-colors"
+            >
+              [?] GUIDE
+            </button>
           </div>
 
           <nav className="space-y-1.5">
@@ -36,11 +46,13 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, stre
               return (
                 <button
                   key={item.path}
+                  data-tour-id={item.tourId}
                   onClick={() => navigate(item.path)}
-                  className={`w-full flex items-center space-x-3 p-2.5 text-left border transition-all duration-150 group font-mono ${isActive
+                  className={`w-full flex items-center space-x-3 p-2.5 text-left border transition-all duration-150 group font-mono ${
+                    isActive
                       ? 'border-[#00ff66] bg-[#0a0a0c] text-white'
                       : 'border-transparent text-[#8a8a93] hover:border-[#26262b] hover:bg-[#0a0a0c] hover:text-white'
-                    }`}
+                  }`}
                 >
                   <span className={isActive ? 'text-[#00ff66]' : 'text-[#26262b] group-hover:text-[#8a8a93]'}>
                     {item.idx}//
@@ -53,7 +65,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, stre
         </div>
 
         <div className="mt-auto space-y-3 pt-4 border-t border-[#26262b]">
-          <div className="bg-[#0a0a0c] p-3 border border-[#26262b] rounded">
+          <div data-tour-id="tour-streak-widget" className="bg-[#0a0a0c] p-3 border border-[#26262b] rounded">
             <div className="text-[9px] text-[#8a8a93] font-black tracking-widest mb-1">STREAK_STABILITY_CORE</div>
             <div className="flex items-baseline space-x-1.5">
               <span className="text-2xl font-black text-[#00ff66] tracking-tighter">

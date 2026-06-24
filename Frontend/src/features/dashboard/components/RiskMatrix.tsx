@@ -1,6 +1,7 @@
+import { api } from '@/lib/api-client.ts';
+import type { ApiResponse, WeaknessFrequency } from '@/types/index.ts';
 import React, { useState, useEffect } from 'react';
-import { api } from '../../../lib/api-client';
-import type { ApiResponse, WeaknessFrequency } from '../../../types';
+
 
 export const RiskMatrix: React.FC = () => {
   const [weaknesses, setWeaknesses] = useState<WeaknessFrequency[]>([]);
@@ -33,7 +34,7 @@ export const RiskMatrix: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#121215] border-2 border-[#26262b] p-4 font-mono shadow-brutal">
+    <div data-tour-id="tour-metric-grid" className="bg-[#121215] border-2 border-[#26262b] p-4 font-mono shadow-brutal">
       <div className="text-xs font-black tracking-widest text-[#ff5500] border-b border-[#26262b] pb-2 mb-4 uppercase">
         02 // ARCHITECTURAL_RISK_FACTORS
       </div>

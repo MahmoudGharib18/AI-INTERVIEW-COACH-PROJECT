@@ -1,9 +1,10 @@
+import { Button } from '@/components/ui/Button.tsx';
+import { Input } from '@/components/ui/Input.tsx';
+import { APP_ROUTES } from '@/config/constants.ts';
+import { useAuthActions } from '@/features/auth/hooks/useAuthActions.ts';
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuthActions } from '../hooks/useAuthActions';
-import { Input } from '../../../components/ui/Input';
-import { Button } from '../../../components/ui/Button';
-import { APP_ROUTES } from '../../../config/constants';
+
 
 export const AuthConsole: React.FC = () => {
   const navigate = useNavigate();

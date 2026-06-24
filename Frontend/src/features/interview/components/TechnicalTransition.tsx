@@ -1,7 +1,8 @@
+import { Button } from '@/components/ui/Button.tsx';
+import { APP_ROUTES } from '@/config/constants.ts';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '../../../components/ui/Button';
-import { APP_ROUTES } from '../../../config/constants';
+
 
 export const TechnicalTransition: React.FC = () => {
   const navigate = useNavigate();

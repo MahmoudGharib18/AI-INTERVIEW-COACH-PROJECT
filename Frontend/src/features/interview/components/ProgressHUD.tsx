@@ -1,5 +1,5 @@
+import { useCountdown } from '@/features/interview/hooks/useCountdown.ts';
 import React from 'react';
-import { useCountdown } from '../hooks/useCountdown';
 
 interface ProgressHUDProps {
   durationSeconds: number;

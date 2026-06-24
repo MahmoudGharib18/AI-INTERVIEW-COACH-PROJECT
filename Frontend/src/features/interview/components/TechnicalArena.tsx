@@ -1,11 +1,12 @@
+import { Button } from '@/components/ui/Button.tsx';
+import { APP_ROUTES, TECHNICAL_TIME_LIMIT_SECONDS } from '@/config/constants.ts';
+import { ChatFeed } from '@/features/interview/components/ChatFeed.tsx';
+import { ProgressHUD } from '@/features/interview/components/ProgressHUD.tsx';
+import { technicalService } from '@/features/interview/services/technical.ts';
+import { sessionService } from '@/features/session/services/session.ts';
 import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ProgressHUD } from './ProgressHUD';
-import { ChatFeed } from './ChatFeed';
-import { Button } from '../../../components/ui/Button';
-import { technicalService } from '../services/technical';
-import { sessionService } from '../../session/services/session';
-import { TECHNICAL_TIME_LIMIT_SECONDS, APP_ROUTES } from '../../../config/constants';
+
 
 interface TechnicalArenaProps {
   sessionId: string;

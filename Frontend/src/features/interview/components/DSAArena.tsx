@@ -1,13 +1,14 @@
+import { Button } from '@/components/ui/Button.tsx';
+import { APP_ROUTES, DSA_TIME_LIMITS_SECONDS } from '@/config/constants.ts';
+import { ChatFeed } from '@/features/interview/components/ChatFeed.tsx';
+import { CodeConsole } from '@/features/interview/components/CodeConsole.tsx';
+import { ProgressHUD } from '@/features/interview/components/ProgressHUD.tsx';
+import { dsaService } from '@/features/interview/services/dsa.ts';
+import { sessionService } from '@/features/session/services/session.ts';
+import type { Problem } from '@/types/index.ts';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ProgressHUD } from './ProgressHUD';
-import { CodeConsole } from './CodeConsole';
-import { ChatFeed } from './ChatFeed';
-import { Button } from '../../../components/ui/Button';
-import { dsaService } from '../services/dsa';
-import { sessionService } from '../../session/services/session';
-import { DSA_TIME_LIMITS_SECONDS, APP_ROUTES } from '../../../config/constants';
-import type { Problem } from '../../../types';
+
 
 interface DSAArenaProps {
   sessionId: string;
@@ -47,7 +48,7 @@ export const DSAArena: React.FC<DSAArenaProps> = ({ sessionId, dsaInterviewId, p
       },
     ]);
     setErrorMsg(null);
-  }, [activeIndex]);
+  }, [activeIndex, activeProblem.description]);
 
   const handleClarify = async () => {
     if (!chatInput.trim()) return;
@@ -152,7 +153,7 @@ export const DSAArena: React.FC<DSAArenaProps> = ({ sessionId, dsaInterviewId, p
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="flex flex-col space-y-3">
           <div className="bg-[#121215] border-2 border-[#26262b] p-4 text-xs leading-relaxed text-gray-300 shadow-brutal max-h-48 overflow-y-auto">
             <span className="text-white font-black block mb-2 border-b border-[#26262b] pb-1 uppercase">
@@ -189,7 +190,47 @@ export const DSAArena: React.FC<DSAArenaProps> = ({ sessionId, dsaInterviewId, p
                 : 'SUBMIT_AND_CONTINUE'}
           </Button>
         </div>
+      </div> */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Column 1: Problem statement */}
+        <div className="bg-[#121215] border-2 border-[#26262b] p-4 text-xs leading-relaxed text-gray-300 shadow-brutal max-h-[500px] overflow-y-auto">
+          <span className="text-white font-black block mb-2 border-b border-[#26262b] pb-1 uppercase">
+            🎯 PROBLEM_CONSTRAINTS
+          </span>
+          <p className="whitespace-pre-wrap mb-2">{activeProblem.description}</p>
+          <ul className="list-disc list-inside space-y-0.5 text-[#8a8a93]">
+            {activeProblem.constraints.map((c, i) => (
+              <li key={i}>{c}</li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Column 2: Code editor */}
+        <div className="flex flex-col min-h-[500px]">
+          <CodeConsole code={code} onChange={setCode} language="javascript" />
+        </div>
+
+        {/* Column 3: Chat feed */}
+        <div className="flex flex-col space-y-4">
+          <div className="flex-1">
+            <ChatFeed
+              messages={messages}
+              inputValue={chatInput}
+              onInputChange={setChatInput}
+              onSendMessage={handleClarify}
+              disabled={submitting}
+            />
+          </div>
+        </div>
       </div>
+
+      <Button variant="orange" className="w-full" onClick={submitCurrentProblem} disabled={submitting}>
+        {submitting
+          ? 'SUBMITTING...'
+          : isLastProblem
+            ? 'SUBMIT_FINAL_PROBLEM_AND_ADVANCE'
+            : 'SUBMIT_AND_CONTINUE'}
+      </Button>
     </div>
   );
 };

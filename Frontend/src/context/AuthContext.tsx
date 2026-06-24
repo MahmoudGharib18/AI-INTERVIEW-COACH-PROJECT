@@ -1,6 +1,7 @@
+import { authService } from '@/features/auth/services/auth.ts';
+import type { User } from '@/types/index.ts';
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { User } from '../types';
-import { authService } from '../features/auth/services/auth';
+
 
 interface AuthContextType {
   user: User | null;

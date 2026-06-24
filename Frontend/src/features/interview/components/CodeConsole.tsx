@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import Editor, { type OnMount, type OnChange } from '@monaco-editor/react';
 
 interface CodeConsoleProps {
   code: string;
@@ -7,45 +8,17 @@ interface CodeConsoleProps {
   readOnly?: boolean;
 }
 
-export const CodeConsole: React.FC<CodeConsoleProps> = ({ 
-  code, 
-  onChange, 
-  language = 'javascript', 
-  readOnly = false 
+export const CodeConsole: React.FC<CodeConsoleProps> = ({
+  code,
+  onChange,
+  language = 'javascript',
+  readOnly = false,
 }) => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<any>(null);
 
-  useEffect(() => {
-    // Dynamically loading Monaco distribution layer from cdn infrastructure securely
-    if (!(window as any).monaco) {
-      const script = document.createElement('script');
-      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js';
-      script.async = true;
-      script.onload = () => {
-        (window as any).require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs' } });
-        (window as any).require(['vs/editor/main'], () => {
-          initializeEditor();
-        });
-      };
-      document.body.appendChild(script);
-    } else {
-      initializeEditor();
-    }
+  const handleMount: OnMount = (editor, monaco) => {
+    editorRef.current = editor;
 
-    return () => {
-      if (editorRef.current) {
-        editorRef.current.dispose();
-      }
-    };
-  }, []);
-
-  const initializeEditor = () => {
-    if (!containerRef.current || (window as any).monaco) return;
-    
-    const monaco = (window as any).monaco;
-    
-    // Custom theme configuration matching core brutal canvas parameters
     monaco.editor.defineTheme('cyberBrutalTheme', {
       base: 'vs-dark',
       inherit: true,
@@ -53,7 +26,7 @@ export const CodeConsole: React.FC<CodeConsoleProps> = ({
         { token: 'comment', foreground: '6a737d', fontStyle: 'italic' },
         { token: 'keyword', foreground: 'ff5500', fontStyle: 'bold' },
         { token: 'string', foreground: '00ff66' },
-        { token: 'number', foreground: 'ffb86c' }
+        { token: 'number', foreground: 'ffb86c' },
       ],
       colors: {
         'editor.background': '#0a0a0c',
@@ -61,34 +34,16 @@ export const CodeConsole: React.FC<CodeConsoleProps> = ({
         'editorLineNumber.foreground': '#26262b',
         'editorLineNumber.activeForeground': '#00ff66',
         'editor.lineHighlightBackground': '#121215',
-      }
+      },
     });
-
-    editorRef.current = monaco.editor.create(containerRef.current, {
-      value: code,
-      language: language,
-      theme: 'cyberBrutalTheme',
-      automaticLayout: true,
-      readOnly: readOnly,
-      fontSize: 12,
-      fontFamily: 'monospace',
-      minimap: { enabled: false },
-      lineNumbers: 'on',
-      scrollbar: { vertical: 'visible', horizontal: 'visible' }
-    });
-
-    editorRef.current.onDidChangeModelContent(() => {
-      if (!readOnly && onChange) {
-        onChange(editorRef.current.getValue());
-      }
-    });
+    monaco.editor.setTheme('cyberBrutalTheme');
   };
 
-  useEffect(() => {
-    if (editorRef.current && editorRef.current.getValue() !== code) {
-      editorRef.current.setValue(code);
+  const handleChange: OnChange = (value) => {
+    if (!readOnly) {
+      onChange(value ?? '');
     }
-  }, [code]);
+  };
 
   return (
     <div className="w-full h-full flex flex-col border-2 border-[#26262b] bg-[#0a0a0c]">
@@ -96,7 +51,29 @@ export const CodeConsole: React.FC<CodeConsoleProps> = ({
         <span>EDITOR_INSTANCE // ENV: {language.toUpperCase()}</span>
         <span>{readOnly ? '🔐 LOCKED_MODE' : '🔓 READ_WRITE'}</span>
       </div>
-      <div ref={containerRef} className="flex-1 w-full min-h-[350px]" />
+      <div className="flex-1 w-full min-h-[350px]">
+        <Editor
+          value={code}
+          language={language}
+          onMount={handleMount}
+          onChange={handleChange}
+          options={{
+            readOnly,
+            fontSize: 12,
+            fontFamily: 'monospace',
+            minimap: { enabled: false },
+            lineNumbers: 'on',
+            automaticLayout: true,
+            scrollbar: { vertical: 'visible', horizontal: 'visible' },
+          }}
+          theme="vs-dark"
+          loading={
+            <div className="w-full h-full flex items-center justify-center text-xs text-[#8a8a93] uppercase">
+              Loading editor...
+            </div>
+          }
+        />
+      </div>
     </div>
   );
 };

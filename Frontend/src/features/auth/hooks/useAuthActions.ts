@@ -1,10 +1,12 @@
+import { useAuth } from "@/context/AuthContext.tsx";
+import { useTour } from "@/context/TourContext.tsx";
+import { authService } from "@/features/auth/services/auth.ts";
+import type { User } from "@/types/index.ts";
 import { useState } from "react";
-import { useAuth } from "../../../context/AuthContext";
-import { authService } from "../services/auth";
-import type { User } from "../../../types";
 
 export const useAuthActions = () => {
 	const { setUser } = useAuth();
+	const { startTour } = useTour();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [authError, setAuthError] = useState<string | null>(null);
 
@@ -32,6 +34,7 @@ export const useAuthActions = () => {
 			const response = await authService.register(payload);
 			const userRecord: User = response.data.data.user;
 			setUser(userRecord);
+			setTimeout(() => startTour(), 300);
 			return { success: true };
 		} catch (err: any) {
 			const msg = err.message || "Registration failed.";

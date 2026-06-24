@@ -1,7 +1,8 @@
+import { Badge } from '@/components/ui/Badge.tsx';
+import { api } from '@/lib/api-client.ts';
+import type { ApiResponse, ProgressOverview } from '@/types/index.ts';
 import React, { useState, useEffect } from 'react';
-import { api } from '../../../lib/api-client';
-import { Badge } from '../../../components/ui/Badge';
-import type { ApiResponse, ProgressOverview } from '../../../types';
+
 
 export const MetricGrid: React.FC = () => {
   const [metrics, setMetrics] = useState<ProgressOverview | null>(null);
@@ -42,7 +43,7 @@ export const MetricGrid: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-4 font-mono">
+    <div data-tour-id="tour-metric-grid" className="space-y-4 font-mono">
       {error && (
         <div className="bg-[#ff0033]/5 border border-[#ff0033] text-[#ff0033] p-2 text-xs uppercase font-bold">
           ⚠️ METRICS_FALLBACK_ACTIVE: {error}

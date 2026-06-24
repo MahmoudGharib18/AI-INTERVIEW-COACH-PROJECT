@@ -1,11 +1,12 @@
+import { GlitchToast } from '@/components/feedback/GlitchToast.tsx';
+import { Button } from '@/components/ui/Button.tsx';
+import { APP_ROUTES } from '@/config/constants.ts';
+import { sessionService } from '@/features/session/services/session.ts';
+import { GithubSync } from '@/features/sync-launchpad/components/GithubSync.tsx';
+import { LinkedinDraft } from '@/features/sync-launchpad/components/LinkedinDraft.tsx';
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { GithubSync } from './GithubSync';
-import { LinkedinDraft } from './LinkedinDraft';
-import { GlitchToast } from '../../../components/feedback/GlitchToast';
-import { Button } from '../../../components/ui/Button';
-import { sessionService } from '../../session/services/session';
-import { APP_ROUTES } from '../../../config/constants';
+
 
 export const SyncLaunchpadPage: React.FC = () => {
   const location = useLocation();

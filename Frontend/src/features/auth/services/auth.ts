@@ -1,5 +1,6 @@
-import { api } from '../../../lib/api-client';
-import type { ApiResponse, User } from '../../../types';
+import { api } from "@/lib/api-client.ts";
+import type { ApiResponse, User } from "@/types/index.ts";
+
 
 export interface LoginPayload {
   email: string;

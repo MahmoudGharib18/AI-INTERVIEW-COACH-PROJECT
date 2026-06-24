@@ -1,5 +1,7 @@
-import { api } from '../../../lib/api-client';
-import type { ApiResponse, Session } from '../../../types';
+import { api } from '@/lib/api-client.ts';
+import type { ApiResponse } from '@/types/index.ts';
+import type { Session } from '@/types/index.ts';
+
 
 export const sessionService = {
   getActive: () =>

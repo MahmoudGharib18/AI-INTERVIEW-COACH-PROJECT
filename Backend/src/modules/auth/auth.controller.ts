@@ -10,7 +10,7 @@ const COOKIE_OPTIONS = {
 	httpOnly: true,
 	secure: env.NODE_ENV === "production",
 	sameSite: (env.NODE_ENV === "production" ? "none" : "lax") as "none" | "lax",
-	maxAge: ONE_DAY_MS, // keep in sync with JWT_EXPIRES_IN
+	maxAge: 24 * 60 * 60 * 1000, // keep in sync with JWT_EXPIRES_IN
 };
 
 export const register = catchAsync(async (req: Request, res: Response) => {

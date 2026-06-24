@@ -1,5 +1,6 @@
-import { api } from "../../../lib/api-client";
-import type { ApiResponse, Interview, EvaluationResult } from "../../../types";
+import { api } from "@/lib/api-client.ts";
+import type { ApiResponse, EvaluationResult, Interview } from "@/types/index.ts";
+
 
 export const technicalService = {
 	getById: (interviewId: string) => api.get<ApiResponse<{ interview: Interview }>>(`/technical-interview/${interviewId}`),

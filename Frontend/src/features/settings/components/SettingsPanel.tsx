@@ -1,8 +1,9 @@
+import { Button } from '@/components/ui/Button.tsx';
+import { Input } from '@/components/ui/Input.tsx';
+import { useAuth } from '@/context/AuthContext.tsx';
+import { userService } from '@/features/settings/services/user.ts';
 import React, { useState } from 'react';
-import { useAuth } from '../../../context/AuthContext';
-import { userService } from '../services/user';
-import { Input } from '../../../components/ui/Input';
-import { Button } from '../../../components/ui/Button';
+
 
 export const SettingsPanel: React.FC = () => {
   const { user, setUser } = useAuth();

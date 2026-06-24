@@ -1,8 +1,9 @@
+import { Button } from '@/components/ui/Button.tsx';
+import { Input } from '@/components/ui/Input.tsx';
+import { api } from '@/lib/api-client.ts';
+import type { ApiResponse } from '@/types/index.ts';
 import React, { useState } from 'react';
-import { api } from '../../../lib/api-client';
-import { Input } from '../../../components/ui/Input';
-import { Button } from '../../../components/ui/Button';
-import type { ApiResponse } from '../../../types';
+
 
 interface GithubSyncProps {
   sessionId: string;

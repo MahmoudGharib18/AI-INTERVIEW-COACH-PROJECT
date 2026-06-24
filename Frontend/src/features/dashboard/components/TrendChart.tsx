@@ -1,6 +1,7 @@
+import { api } from '@/lib/api-client.ts';
+import type { ApiResponse, TrendPoint } from '@/types/index.ts';
 import React, { useEffect, useRef, useState } from 'react';
-import { api } from '../../../lib/api-client';
-import type { ApiResponse, TrendPoint } from '../../../types';
+
 
 export const TrendChart: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -82,7 +83,7 @@ export const TrendChart: React.FC = () => {
   }
 
   return (
-    <div className="bg-[#121215] border-2 border-[#26262b] p-4 font-mono shadow-brutal scanlines">
+    <div data-tour-id="tour-metric-grid" className="bg-[#121215] border-2 border-[#26262b] p-4 font-mono shadow-brutal scanlines">
       <div className="text-xs font-black tracking-widest text-white border-b border-[#26262b] pb-2 mb-4 uppercase">
         01 // SCORE_PERFORMANCE_TREND
       </div>

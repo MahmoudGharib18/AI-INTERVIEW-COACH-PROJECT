@@ -1,8 +1,9 @@
+import { ScanlineLoader } from '@/components/feedback/ScanlineLoader.tsx';
+import { APP_ROUTES } from '@/config/constants.ts';
+import { useAuth } from '@/context/AuthContext.tsx';
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { ScanlineLoader } from '../components/feedback/ScanlineLoader';
-import { APP_ROUTES } from '../config/constants';
+
 
 interface GuardedRouteProps {
   children: React.JSX.Element;

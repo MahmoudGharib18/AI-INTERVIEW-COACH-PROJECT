@@ -1,17 +1,16 @@
+import { DashboardLayout } from '@/components/layout/DashboardLayout.tsx';
+import { APP_ROUTES } from '@/config/constants.ts';
+import { AuthConsole, useAuthActions } from '@/features/auth/index.ts';
+import { MetricGrid, RiskMatrix, TrendChart } from '@/features/dashboard/index.ts';
+import { SessionGate } from '@/features/session/components/sessionGate.tsx';
+import { SettingsPanel } from '@/features/settings/components/SettingsPanel.tsx';
+import { SyncLaunchpadPage } from '@/features/sync-launchpad/components/SyncLaunchpadPage.tsx';
+import { api } from '@/lib/api-client.ts';
+import { GuardedRoute } from '@/routes/GuardedRoute.tsx';
+import type { ApiResponse, ProgressOverview } from '@/types/index.ts';
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { GuardedRoute } from './GuardedRoute';
-import { APP_ROUTES } from '../config/constants';
-import { api } from '../lib/api-client';
-import type { ApiResponse, ProgressOverview } from '../types';
 
-import { DashboardLayout } from '../components/layout/DashboardLayout';
-import { AuthConsole } from '../features/auth/components/AuthConsole';
-import { useAuthActions } from '../features/auth/hooks/useAuthActions';
-import { MetricGrid, TrendChart, RiskMatrix } from '../features/dashboard';
-import { SettingsPanel } from '../features/settings/components/SettingsPanel';
-import { SyncLaunchpadPage } from '../features/sync-launchpad/components/SyncLaunchpadPage';
-import { SessionGate } from '@/features/session/components/sessionGate.tsx';
 
 export const AppRoutes: React.FC = () => {
   const { executeLogout } = useAuthActions();
@@ -74,6 +73,7 @@ export const AppRoutes: React.FC = () => {
                     There's no separate selection step — starting your session below will walk you through DSA, then automatically into the Technical round.
                   </p>
                   <a
+                    data-tour-id="tour-metric-grid"
                     href={APP_ROUTES.ARENA_DSA}
                     className="inline-block border border-[#00ff66] text-[#00ff66] font-mono font-black text-[10px] tracking-widest px-4 py-2 uppercase hover:bg-[#00ff66] hover:text-black transition-colors"
                   >

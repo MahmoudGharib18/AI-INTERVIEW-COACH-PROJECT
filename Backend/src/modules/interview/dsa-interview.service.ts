@@ -21,13 +21,14 @@ export const startDsaInterview = async (sessionId: Types.ObjectId): Promise<{ in
 			question: buildProblemPresentationMessage(p),
 			answer: "",
 			presentedAt: new Date(),
+			difficulty: p.difficulty,
 		})),
 	});
 
 	return { interview, problems };
 };
 
-export const submitDsaAnswer = async (interviewId: string, questionIndex: number, userId: Types.ObjectId, problemId: Types.ObjectId, problem: IProblem, code: string, language: string): Promise<IInterview> => {
+export const submitDsaAnswer = async (interviewId: string, questionIndex: number, userId: Types.ObjectId, problemId: Types.ObjectId | string | null, problem: IProblem, code: string, language: string, problemSnapshot?: string): Promise<IInterview> => {
 	const interview = await Interview.findById(interviewId);
 	if (!interview) throw new AppError("Interview not found", 404);
 
@@ -55,7 +56,7 @@ export const submitDsaAnswer = async (interviewId: string, questionIndex: number
 		throw new AppError("Time limit exceeded for this problem. Your submission was recorded and evaluated, but the time limit was breached.", 408);
 	}
 
-	const submission = await createSubmission(userId, problemId, code, language, SUBMISSION_SOURCES.DAILY_SESSION);
+	const submission = await createSubmission(userId, problemId, code, language, SUBMISSION_SOURCES.DAILY_SESSION, problemSnapshot);
 
 	const evaluation = await evaluateDsaSubmission(submission._id, problem, code, language);
 

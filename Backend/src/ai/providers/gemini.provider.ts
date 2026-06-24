@@ -75,7 +75,7 @@ import { AppError } from "#/shared/errors/AppError.js";
 import { GoogleGenAI, Content } from "@google/genai";
 
 // Standard production-stable Gemini model
-const DEFAULT_MODEL = "gemini-2.5-flash";
+const DEFAULT_MODEL = "gemini-3.1-flash-lite";
 
 // Initialize client. It defaults to the process.env.GEMINI_API_KEY
 const ai = new GoogleGenAI({ apiKey: env.GOOGLE_API_KEY });
