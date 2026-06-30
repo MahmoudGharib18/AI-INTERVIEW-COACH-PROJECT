@@ -4,7 +4,7 @@ import { catchAsync } from "#/shared/utils/catchAsync.js";
 import { Request, Response } from "express";
 
 
-const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+// const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 const COOKIE_OPTIONS = {
 	httpOnly: true,
