@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import Editor, { type OnMount, type OnChange } from '@monaco-editor/react';
 
 interface CodeConsoleProps {
