@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
-import { Submission, ISubmission } from "./submission.model";
-import { SubmissionSource } from "@/config/constants";
+import { Submission, ISubmission } from "./submission.model.js";
+import { SubmissionSource } from "@/config/constants.js";
 
 export const createSubmission = async (userId: Types.ObjectId, problemId: Types.ObjectId | string | null, code: string, language: string, source: SubmissionSource, problemSnapshot?: string): Promise<ISubmission> => {
 	const isRealProblemId = problemId && typeof problemId !== "string" ? true : isValidObjectIdString(problemId);
