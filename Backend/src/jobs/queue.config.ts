@@ -7,6 +7,8 @@ import { ConnectionOptions } from 'bullmq';
 export const bullConnection: ConnectionOptions = {
   host: redisClient.options.host,
   port: redisClient.options.port,
+  username: redisClient.options.username || 'default',
+  password: redisClient.options.password
 };
 
 export const EMAIL_QUEUE_NAME = 'email-queue';
